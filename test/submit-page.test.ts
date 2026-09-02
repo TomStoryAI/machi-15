@@ -36,6 +36,8 @@ function getFetch() {
 
 beforeEach(() => {
   setupPage()
+  // jsdom has no URL.createObjectURL; the photo preview needs one.
+  URL.createObjectURL = ((blob: Blob) => `blob:fake-${blob.size}`) as typeof URL.createObjectURL
 })
 
 afterEach(() => {
@@ -124,6 +126,63 @@ describe('submit page form', () => {
     })
     expect(getFetch()).toHaveBeenCalledTimes(2)
     expect((document.getElementById('mgmt-link') as HTMLAnchorElement).href).toBe(`${location.origin}/p/p2?t=t2`)
+  })
+
+  it('uploads a selected photo to the created post with the management token', async () => {
+    vi.stubGlobal('createImageBitmap', vi.fn().mockResolvedValue({ width: 800, height: 600, close: vi.fn() }))
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+      if (url === '/api/posts') return Promise.resolve(jsonResponse(201, { postId: 'p1', mgmtToken: 'tok' }))
+      return Promise.resolve(jsonResponse(201, { photoKey: 'k1' }))
+    }))
+
+    // select a photo first (small image -> passes through untouched)
+    const input = document.getElementById('photo-file') as HTMLInputElement
+    const file = new File(['foto-bytes'], 'foto.jpg', { type: 'image/jpeg' })
+    Object.defineProperty(input, 'files', { value: [file], configurable: true })
+    input.dispatchEvent(new Event('change'))
+    await vi.waitFor(() => {
+      expect(document.getElementById('photo-note')!.hidden).toBe(false)
+    })
+
+    fillForm()
+
+    const confirmation = document.getElementById('confirmation')!
+    await vi.waitFor(() => {
+      expect(confirmation.hidden).toBe(false)
+    })
+
+    const photoCall = getFetch().mock.calls.find(([url]) => url === '/api/posts/p1/photo?t=tok')!
+    expect(photoCall).toBeTruthy()
+    expect(photoCall[1].method).toBe('POST')
+    const body = photoCall[1].body as FormData
+    const uploaded = body.get('photo') as File
+    expect(uploaded.name).toBe('foto.jpg')
+    expect(uploaded.size).toBe(file.size)
+  })
+
+  it('still confirms the post but notes when the photo upload fails', async () => {
+    vi.stubGlobal('createImageBitmap', vi.fn().mockResolvedValue({ width: 800, height: 600, close: vi.fn() }))
+    vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
+      if (url === '/api/posts') return Promise.resolve(jsonResponse(201, { postId: 'p1', mgmtToken: 'tok' }))
+      return Promise.resolve(jsonResponse(400, { error: 'Bitte wähle ein Bild aus.' }))
+    }))
+
+    const input = document.getElementById('photo-file') as HTMLInputElement
+    const file = new File(['foto-bytes'], 'foto.jpg', { type: 'image/jpeg' })
+    Object.defineProperty(input, 'files', { value: [file], configurable: true })
+    input.dispatchEvent(new Event('change'))
+    await vi.waitFor(() => {
+      expect(document.getElementById('photo-note')!.hidden).toBe(false)
+    })
+
+    fillForm()
+
+    const confirmation = document.getElementById('confirmation')!
+    await vi.waitFor(() => {
+      expect(confirmation.hidden).toBe(false)
+    })
+    expect(document.getElementById('photo-warn')!.hidden).toBe(false)
+    expect(document.getElementById('photo-warn')!.textContent).toContain('Foto konnte nicht hochgeladen werden')
   })
 })
 

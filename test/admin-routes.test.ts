@@ -162,13 +162,14 @@ describe('authed admin endpoints', () => {
     expect(res.status).toBe(404)
   })
 
-  it('deletes a post and its comments', async () => {
+  it('deletes a post and its comments and photos', async () => {
     const token = (await (await login()).json()).token
     const res = await request('/api/admin/b1/posts/post-1', { method: 'DELETE', headers: bearer(token) })
     expect(res.status).toBe(200)
     const state = db._state()
     expect(state.posts).toHaveLength(0)
     expect(state.comments).toHaveLength(0)
+    expect(state.photos).toHaveLength(0)
   })
 
   it('returns 404 for an unknown post', async () => {

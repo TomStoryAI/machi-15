@@ -14,7 +14,7 @@ const pendingBody = {
 }
 const liveBody = {
   posts: [
-    { id: 'post-2', category: 'Suche', title: 'Suche: Katze', body: 'Entlaufen.', photoKey: null, contactPhone: null, contactEmail: null, contactWhatsapp: null, contactInstagram: null, contactAddress: null, durationWeeks: 2, createdAt: '2026-09-01 10:00:00' },
+    { id: 'post-2', category: 'Suche', title: 'Suche: Katze', body: 'Entlaufen.', photoKey: 'k2', contactPhone: null, contactEmail: null, contactWhatsapp: null, contactInstagram: null, contactAddress: null, durationWeeks: 2, createdAt: '2026-09-01 10:00:00' },
   ],
 }
 
@@ -109,6 +109,8 @@ describe('admin page', () => {
     const live = document.getElementById('live-posts')!
     expect(live.textContent).toContain('Suche: Katze')
     expect(live.textContent).toContain('Löschen')
+    const liveImg = live.querySelector('img')!
+    expect(liveImg.getAttribute('src')).toBe('/api/photos/k2')
   })
 
   it('shows the generic German error on a wrong password', async () => {

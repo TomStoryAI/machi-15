@@ -12,7 +12,7 @@ type PosterPostRow = PostRow & {
 
 export const posterRoutes = new Hono()
 
-async function findPostByToken(db: D1Database, id: string, token: string): Promise<PosterPostRow | null> {
+export async function findPostByToken(db: D1Database, id: string, token: string): Promise<PosterPostRow | null> {
   const post = await db
     .prepare(`SELECT ${POST_COLUMNS}, status, mgmt_token_hash, approved_at, expires_at FROM posts WHERE id = ?`)
     .bind(id)

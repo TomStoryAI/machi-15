@@ -40,6 +40,7 @@ function liveCard(post) {
       <span class="badge">${esc(post.category)}</span>
       <h4>${esc(post.title)}</h4>
       <p>${esc(post.body)}</p>
+      ${post.photoKey ? `<img src="/api/photos/${esc(post.photoKey)}" alt="Foto" loading="lazy" />` : ''}
       ${contactsLine(post)}
       <p class="meta">${esc(post.createdAt)}</p>
       <div class="actions">

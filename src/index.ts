@@ -4,6 +4,7 @@ import { adminRoutes } from './admin'
 import { feedRoutes } from './feed'
 import { commentsRoutes } from './comments'
 import { posterRoutes } from './poster'
+import { photosRoutes } from './photos'
 
 const app = new Hono()
 
@@ -13,6 +14,7 @@ app.route('/', adminRoutes)
 app.route('/', feedRoutes)
 app.route('/', commentsRoutes)
 app.route('/', posterRoutes)
+app.route('/', photosRoutes)
 
 // Submit page: one static file served under every board's URL; the page reads the boardId from its own path.
 app.get('/b/:boardId/neu', async (c) => {

@@ -128,6 +128,20 @@ export function initSubmitPage() {
       document.getElementById('mgmt-qr').innerHTML = qrSvg(url)
       formSection.hidden = true
       confirmation.hidden = false
+
+      // Photo upload (spec 004): post is created; attach the prepared photo with the management token.
+      if (photoBlob) {
+        const fd = new FormData()
+        fd.set('photo', photoBlob, photoBlob.name || 'foto.jpg')
+        const upload = await postWithRetry(`/api/posts/${data.postId}/photo?t=${encodeURIComponent(data.mgmtToken)}`, {
+          method: 'POST',
+          body: fd,
+        })
+        if (!upload || !upload.ok) {
+          const warn = document.getElementById('photo-warn')
+          warn.hidden = false
+        }
+      }
     } else {
       const data = await res.json().catch(() => ({}))
       showError(data.error || 'Etwas ist schiefgelaufen. Bitte versuche es erneut.')

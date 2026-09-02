@@ -227,6 +227,7 @@ adminRoutes.delete('/api/admin/:boardId/posts/:id', async (c) => {
   if (!(await requireAdmin(db, c))) return c.json(UNAUTHORIZED, 401)
   const { boardId, id } = c.req.param()
   await db.prepare('DELETE FROM comments WHERE post_id = ?').bind(id).run()
+  await db.prepare('DELETE FROM photos WHERE post_id = ?').bind(id).run()
   const r = await db.prepare('DELETE FROM posts WHERE id = ? AND board_id = ?').bind(id, boardId).run()
   if (!r.meta.changes) return c.json({ error: 'Inserat nicht gefunden.' }, 404)
   return c.json({ ok: true })

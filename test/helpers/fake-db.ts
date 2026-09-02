@@ -31,12 +31,14 @@ export type FakePost = {
 }
 export type FakeComment = { id: string; post_id: string; body: string; status: 'pending' | 'live' | 'rejected'; created_at: string }
 export type FakeSession = { token_hash: string; board_id: string; expires_at: string }
+export type FakePhoto = { key: string; post_id: string; content_type: string; data_base64: string }
 
 export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?: FakeComment[]; recentComments?: number }) {
   const boards = [seed.board]
   const posts: FakePost[] = seed.posts ?? []
   const comments: FakeComment[] = seed.comments ?? []
   const sessions: FakeSession[] = []
+  const photos: FakePhoto[] = []
   let recentComments = seed.recentComments ?? 0
 
   type Stmt = {
@@ -78,9 +80,17 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
       const post = posts.find((p) => p.id === bound[0] && p.board_id === bound[1])
       return post ? { duration_weeks: post.duration_weeks } : null
     }
+    if (query.includes('photo_key = ?')) {
+      const post = posts.find((p) => p.photo_key === bound[0])
+      return post ? { ...post, mgmt_token_hash: post.mgmt_token_hash ?? null } : null
+    }
     if (query.includes('mgmt_token_hash')) {
       const post = posts.find((p) => p.id === bound[0])
       return post ? { ...post, mgmt_token_hash: post.mgmt_token_hash ?? null } : null
+    }
+    if (query.includes('FROM photos')) {
+      const photo = photos.find((p) => p.key === bound[0])
+      return photo ?? null
     }
     if (query.includes('FROM posts') && query.includes('expires_at') && query.includes('status')) {
       const post = posts.find((p) => p.id === bound[0])
@@ -123,6 +133,10 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
   }
 
   function runMutation(query: string): number {
+    if (query.startsWith('INSERT INTO photos')) {
+      photos.push({ key: bound[0] as string, post_id: bound[1] as string, content_type: bound[2] as string, data_base64: bound[3] as string })
+      return 1
+    }
     if (query.startsWith('INSERT INTO comments')) {
       comments.push({
         id: bound[0] as string,
@@ -135,6 +149,13 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
     }
     if (query.startsWith('INSERT INTO admin_sessions')) {
       sessions.push({ token_hash: bound[0] as string, board_id: bound[1] as string, expires_at: bound[2] as string })
+      return 1
+    }
+    if (query.startsWith('UPDATE posts') && query.includes('photo_key')) {
+      // binds: (photoKey, postId, tokenHash)
+      const post = posts.find((p) => p.id === bound[1] && p.mgmt_token_hash === bound[2])
+      if (!post) return 0
+      post.photo_key = bound[0] as string
       return 1
     }
     if (query.startsWith('UPDATE posts') && query.includes('deleted')) {
@@ -168,6 +189,13 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
       }
       return before - comments.length
     }
+    if (query.startsWith('DELETE FROM photos')) {
+      const before = photos.length
+      for (let i = photos.length - 1; i >= 0; i--) {
+        if (photos[i].post_id === bound[0]) photos.splice(i, 1)
+      }
+      return before - photos.length
+    }
     if (query.startsWith('DELETE FROM posts')) {
       const idx = posts.findIndex((p) => p.id === bound[0] && p.board_id === bound[1])
       if (idx === -1) return 0
@@ -192,6 +220,7 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
     _state: () => ({
       posts: posts.map((p) => ({ ...p })),
       comments: [...comments],
+      photos: [...photos],
       sessions: [...sessions],
       get recentComments() {
         return recentComments
