@@ -29,6 +29,7 @@ export type FakePost = {
   created_at: string
   mgmt_token_hash?: string
   slot?: number | null
+  expired_at?: string | null
 }
 export type FakeComment = { id: string; post_id: string; body: string; status: 'pending' | 'live' | 'rejected'; created_at: string }
 export type FakeSession = { token_hash: string; board_id: string; expires_at: string }
@@ -114,9 +115,14 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
 
   function allResults(query: string): unknown[] {
     if (query.includes('FROM posts')) {
-      const status = query.includes("status = 'live'") ? 'live' : 'pending'
+      const status = query.includes("status = 'live'")
+        ? 'live'
+        : query.includes("status = 'expired'")
+          ? 'expired'
+          : 'pending'
+      const byBoard = query.includes('board_id = ?')
       return posts
-        .filter((p) => p.board_id === bound[0] && p.status === status)
+        .filter((p) => (byBoard ? p.board_id === bound[0] : true) && p.status === status)
         .sort((a, b) =>
           status === 'live'
             ? (b.approved_at ?? '').localeCompare(a.approved_at ?? '')
@@ -183,6 +189,13 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
     }
     if (query.startsWith('INSERT INTO admin_sessions')) {
       sessions.push({ token_hash: bound[0] as string, board_id: bound[1] as string, expires_at: bound[2] as string })
+      return 1
+    }
+    if (query.startsWith('UPDATE posts') && query.includes('expired')) {
+      const post = posts.find((p) => p.id === bound[1])
+      if (!post) return 0
+      post.status = 'expired'
+      post.expired_at = bound[0] as string
       return 1
     }
     if (query.startsWith('UPDATE posts') && query.includes('photo_key')) {

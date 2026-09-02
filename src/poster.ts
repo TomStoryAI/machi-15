@@ -52,5 +52,12 @@ posterRoutes.delete('/api/posts/:id', async (c) => {
 
   const tokenHash = await sha256Hex(token)
   await db.prepare(`UPDATE posts SET status = 'deleted' WHERE id = ? AND mgmt_token_hash = ?`).bind(id, tokenHash).run()
+  // The photo is gone with the ad (grace cleanup only covers expired posts).
+  if (c.env.PHOTOS) {
+    const row = await db.prepare('SELECT photo_key FROM posts WHERE id = ?').bind(id).first<{ photo_key: string | null }>()
+    if (row?.photo_key) await (c.env.PHOTOS as import('@cloudflare/workers-types').R2Bucket).delete(row.photo_key)
+  } else {
+    await db.prepare('DELETE FROM photos WHERE post_id = ?').bind(id).run()
+  }
   return c.json({ ok: true })
 })

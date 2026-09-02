@@ -5,6 +5,7 @@ import { feedRoutes } from './feed'
 import { commentsRoutes } from './comments'
 import { posterRoutes } from './poster'
 import { photosRoutes } from './photos'
+import { handleScheduled } from './expiry'
 
 const app = new Hono()
 
@@ -42,6 +43,14 @@ app.get('/impressum', async (c) => {
 })
 app.get('/datenschutz', async (c) => {
   return c.env.ASSETS.fetch(new Request(new URL('/datenschutz.html', c.req.url)))
+})
+
+// Nightly expiry cron (spec 011). Attached to the Hono app so the tests keep importing the
+// default export; the Workers runtime sees fetch + scheduled on the same object.
+Object.assign(app, {
+  scheduled: async (_event: unknown, env: Record<string, unknown>) => {
+    await handleScheduled(env as never)
+  },
 })
 
 // Admin page, same pattern.
