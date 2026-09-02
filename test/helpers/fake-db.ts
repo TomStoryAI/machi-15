@@ -23,10 +23,11 @@ export type FakePost = {
   contact_instagram: string | null
   contact_address: string | null
   duration_weeks: number
-  status: 'pending' | 'live' | 'rejected'
+  status: 'pending' | 'live' | 'rejected' | 'deleted'
   expires_at: string | null
   approved_at: string | null
   created_at: string
+  mgmt_token_hash?: string
 }
 export type FakeComment = { id: string; post_id: string; body: string; status: 'pending' | 'live' | 'rejected'; created_at: string }
 export type FakeSession = { token_hash: string; board_id: string; expires_at: string }
@@ -73,9 +74,13 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
       const s = sessions.find((row) => row.token_hash === bound[0] && row.board_id === bound[1])
       return s ?? null
     }
-    if (query.includes('duration_weeks')) {
+    if (query.includes('SELECT duration_weeks FROM posts')) {
       const post = posts.find((p) => p.id === bound[0] && p.board_id === bound[1])
       return post ? { duration_weeks: post.duration_weeks } : null
+    }
+    if (query.includes('mgmt_token_hash')) {
+      const post = posts.find((p) => p.id === bound[0])
+      return post ? { ...post, mgmt_token_hash: post.mgmt_token_hash ?? null } : null
     }
     if (query.includes('FROM posts') && query.includes('expires_at') && query.includes('status')) {
       const post = posts.find((p) => p.id === bound[0])
@@ -97,6 +102,11 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
             ? (b.approved_at ?? '').localeCompare(a.approved_at ?? '')
             : a.created_at.localeCompare(b.created_at),
         )
+    }
+    if (query.includes('FROM comments') && query.includes('post_id = ?')) {
+      return comments
+        .filter((c) => c.post_id === bound[0] && c.status === 'live')
+        .map((c) => ({ id: c.id, post_id: c.post_id, body: c.body, created_at: c.created_at }))
     }
     if (query.includes('FROM comments')) {
       const liveComments = query.includes("c.status = 'live'")
@@ -125,6 +135,12 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
     }
     if (query.startsWith('INSERT INTO admin_sessions')) {
       sessions.push({ token_hash: bound[0] as string, board_id: bound[1] as string, expires_at: bound[2] as string })
+      return 1
+    }
+    if (query.startsWith('UPDATE posts') && query.includes('deleted')) {
+      const post = posts.find((p) => p.id === bound[0] && p.mgmt_token_hash === bound[1])
+      if (!post) return 0
+      post.status = 'deleted'
       return 1
     }
     if (query.startsWith('UPDATE posts')) {
@@ -166,6 +182,11 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
       q = query
       bound = []
       return stmt
+    },
+    // mutate state in tests (state() returns copies)
+    _setPostStatus: (id: string, status: FakePost['status']) => {
+      const p = posts.find((x) => x.id === id)
+      if (p) p.status = status
     },
     // introspect state in tests
     _state: () => ({

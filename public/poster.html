@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mein Inserat — Machi-Board</title>
+    <style>
+      :root {
+        --bg: #f6f5f2;
+        --ink: #1c1b18;
+        --muted: #6b675f;
+        --accent: #0b6e4f;
+        --danger: #b3261e;
+        --card: #ffffff;
+        --line: #dcd9d2;
+        --error-bg: #fdecea;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.5;
+      }
+      .page {
+        max-width: 32rem;
+        margin: 0 auto;
+        padding: 1.25rem 1.25rem 4rem;
+      }
+      header h1 {
+        margin: 0.5rem 0 1.25rem;
+        font-size: 1.5rem;
+      }
+      .status-box {
+        background: #e7efe9;
+        color: var(--accent);
+        border-radius: 0.75rem;
+        padding: 1rem 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        padding: 1.1rem 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .card h2 {
+        margin: 0 0 0.35rem;
+        font-size: 1.2rem;
+      }
+      .card p {
+        margin: 0.25rem 0;
+      }
+      .card .contacts {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .card ul {
+        margin: 0.5rem 0 0;
+        padding-left: 1.2rem;
+      }
+      .card li {
+        margin: 0.3rem 0;
+        overflow-wrap: anywhere;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .empty {
+        color: var(--muted);
+        font-style: italic;
+      }
+      .danger-btn {
+        width: 100%;
+        padding: 0.95rem;
+        font: inherit;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--danger);
+        background: var(--error-bg);
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+      .error {
+        background: var(--error-bg);
+        color: var(--danger);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        margin: 0 0 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Mein Inserat</h1>
+      </header>
+
+      <p id="error" class="error" role="alert" hidden></p>
+
+      <section id="status-box" class="status-box" hidden></section>
+
+      <section id="ad-box" class="card" hidden></section>
+
+      <section id="comments-box" class="card" hidden>
+        <h2>Kommentare</h2>
+        <ul id="comments-list"></ul>
+      </section>
+
+      <button type="button" id="delete-btn" class="danger-btn" hidden>Inserat löschen</button>
+    </main>
+    <script type="module">
+      import { initPosterPage } from '/poster.js'
+      initPosterPage()
+    </script>
+  </body>
+</html>
