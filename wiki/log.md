@@ -2,6 +2,9 @@
 
 ## 2026-09-02
 
+* **Update** — Spec 001 completed: Worker + Hono + `/api/health` live at https://machi-15.machi-15.workers.dev (TDD red-green, D1 remote EEUR with boards/posts/comments, static assets, 404s)
+* **Decision** — Single Worker with assets binding replaces the separate Pages project (one deploy target, one domain, no CORS)
+* **Note** — R2 activation pending in the Cloudflare dashboard (account-level; may ask for payment info). Unblocks spec 004.
 * **Decision** — React reconsidered for the frontend and rejected for the MVP: all four pages stay vanilla HTML/CSS/JS (TV-browser safety on the display, no build step, smallest failure surface). Revisit when the admin grows or platform features arrive.
 * **Update** — Specs reorganized into `created/` and `completed/` folders — the folder is the state (replaces the frontmatter status field)
 * **Decision** — Spec workflow: small numbered specs in wiki/specs/ (001–012), status `created` → `completed`, built in number order

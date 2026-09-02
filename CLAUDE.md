@@ -13,7 +13,7 @@ Digital "schwarzes Brett" (bulletin board) for public 55" Google-TV displays. Pa
 
 ## Stack (decided 2026-09-02)
 
-- **Cloudflare Pages** — static frontends: TV display, submit form, poster page, admin page
+- **Cloudflare Workers (assets binding)** — static frontends (TV display, submit, poster, admin) served by the same Worker as the JSON API; one deploy target
 - **Cloudflare Workers** — JSON API + photo serving + scheduled post-expiry job
 - **Cloudflare D1** — SQLite: `boards`, `posts`, `comments`
 - **Cloudflare R2** — photos (client-side resized to ≤1600px before upload)

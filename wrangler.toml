@@ -5,10 +5,12 @@ compatibility_date = "2026-09-02"
 [[d1_databases]]
 binding = "DB"
 database_name = "machi15-db"
+database_id = "dc10ff94-d2d5-4528-af6f-6919c4dbc15f"
 
-[[r2_buckets]]
-binding = "PHOTOS"
-bucket_name = "machi15-photos"
+# R2 needs one-time activation in the Cloudflare dashboard first.
+# [[r2_buckets]]
+# binding = "PHOTOS"
+# bucket_name = "machi15-photos"
 
 [assets]
 directory = "public"

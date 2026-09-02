@@ -15,8 +15,8 @@ A working machi-15 project skeleton deployed on Cloudflare's free tier.
 * `wrangler init` (TypeScript, Workers) with Hono router
 * `GET /api/health` endpoint
 * D1 database created + first migration (schema from [data-model](../architecture/data-model.md))
-* R2 bucket created
-* Pages project serving the static frontends (stub pages for display/submit/poster/admin)
+* R2 bucket created (pending: R2 activation in the Cloudflare dashboard — account-level step, unblocks spec 004)
+* Static frontends served via the Worker assets binding (stub pages for display/submit/poster/admin; single deploy target)
 * `wrangler.toml` wired (D1 + R2 bindings, routes)
 * `.gitignore` (node_modules, .dev.vars, .wrangler)
 

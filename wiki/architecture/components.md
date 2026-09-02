@@ -7,7 +7,7 @@ status: draft
 
 # Components
 
-## Frontends (Cloudflare Pages)
+## Frontends (served by the Worker via assets binding)
 
 | Page | Path | Purpose |
 |---|---|---|

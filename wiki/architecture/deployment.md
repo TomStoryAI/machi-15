@@ -9,7 +9,7 @@ status: stable
 
 ## Decision
 
-**Cloudflare stack, free plan**: Pages (static frontends) + Workers (API, photo serving, scheduled expiry) + D1 (SQLite) + R2 (photos). Domain machi15.com moves to Cloudflare DNS. No credit card needed at signup.
+**Cloudflare stack, free plan**: one Worker (JSON API + static frontends via assets binding) + D1 (SQLite) + R2 (photos). Domain machi15.com moves to Cloudflare DNS. No credit card needed at signup. (2026-09-02: the separate Pages project was replaced by Worker static assets — one deploy target, one domain, no CORS.)
 
 Repo: `github.com/TomStoryAI/machi-15` (local clone `E:\Programmieren\machi-15`). Dev: `wrangler dev` (simulates Workers + D1 + R2 locally). Deploy: `wrangler deploy`; Pages connected to GitHub `main`.
 
@@ -24,7 +24,7 @@ Repo: `github.com/TomStoryAI/machi-15` (local clone `E:\Programmieren\machi-15`)
 
 | Resource | Free tier | Estimated usage | Verdict |
 |---|---|---|---|
-| Pages | unlimited requests/bandwidth | display + forms | OK forever |
+| Worker static assets | included in the 100k req/day free tier | display + forms ≈ 2–3k/day | OK |
 | Workers | 100k requests/day | ~5k/day (display poll 2.9k + uploads/comments/admin) | ~5% used |
 | D1 | 5 GB, 5M rows-read/day | small tables | OK |
 | R2 | 10 GB, no egress fees | 200 photos/day × ~300 KB ≈ 60 MB/day | free tier lasts ~5.5 months |

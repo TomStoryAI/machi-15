@@ -6,7 +6,6 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 
 | # | Spec | Depends on |
 |---|---|---|
-| 001 | [Repo bootstrap & deploy](created/001-repo-bootstrap.md) | — |
 | 002 | [Submit API](created/002-submit-api.md) | 001 |
 | 003 | [Submit page](created/003-submit-page.md) | 002 |
 | 004 | [Photo storage & serving](created/004-photo-storage.md) | 002 |
@@ -21,6 +20,8 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 
 ## Completed
 
-(none yet)
+| # | Spec |
+|---|---|
+| 001 | [Repo bootstrap & deploy](completed/001-repo-bootstrap.md) |
 
 Overview contract: [wiki/architecture/mvp-spec.md](../architecture/mvp-spec.md)
