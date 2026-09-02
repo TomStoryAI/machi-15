@@ -20,7 +20,10 @@ const feedV1 = {
       contactWhatsapp: null,
       contactInstagram: null,
       contactAddress: null,
-      comments: [{ id: 'c1' }, { id: 'c2' }],
+      comments: [
+        { id: 'c1', body: 'Toller Post!' },
+        { id: 'c2', body: 'Ja, gerne!' },
+      ],
     },
     {
       id: 'p2',
@@ -89,6 +92,8 @@ describe('display page', () => {
     expect(frames.textContent).toContain('Für Hunde in der Nachbarschaft.')
     expect(frames.textContent).toContain('Tel.: 0151 123')
     expect(frames.textContent).toContain('2 Kommentare')
+    expect(frames.textContent).toContain('Toller Post!')
+    expect(frames.textContent).toContain('Ja, gerne!')
     expect(frames.textContent).toContain('Suche: Katze')
     // photo img only for the post with a photoKey
     const imgs = frames.querySelectorAll('img')

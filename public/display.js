@@ -26,6 +26,11 @@ export function commentUrl(origin, boardId, postId) {
 export function frameHtml(post, boardId, origin) {
   const count = post.comments.length
   const commentsBadge = count === 0 ? '' : `<span class="frame-comments">${count === 1 ? '1 Kommentar' : `${count} Kommentare`}</span>`
+  // Feed comments arrive oldest-first; show the newest three in chronological order.
+  const visibleComments = post.comments.slice(-3)
+  const commentList = visibleComments.length
+    ? `<ul class="frame-comment-list">${visibleComments.map((c) => `<li>${esc(c.body)}</li>`).join('')}</ul>`
+    : ''
   return `
     <article class="frame">
       <h2 class="frame-title">${esc(post.title)}</h2>
@@ -33,6 +38,7 @@ export function frameHtml(post, boardId, origin) {
       <p class="frame-body">${esc(post.body)}</p>
       ${contactsLine(post)}
       ${commentsBadge}
+      ${commentList}
       <div class="frame-qr">${qrSvg(commentUrl(origin, boardId, post.id), 3, 1)}</div>
     </article>`
 }

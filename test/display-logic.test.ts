@@ -70,6 +70,30 @@ describe('frameHtml', () => {
     expect(html).toContain('/b/b1/p/p1')
     expect(html).toContain('frame-qr')
   })
+
+  it('renders the latest 3 approved comments under the frame', () => {
+    const comments = [
+      { id: 'c1', body: 'Erster Kommentar.' },
+      { id: 'c2', body: 'Zweiter Kommentar.' },
+      { id: 'c3', body: 'Dritter Kommentar.' },
+      { id: 'c4', body: 'Vierter Kommentar.' },
+    ]
+    const html = frameHtml({ ...basePost, comments }, 'b1', 'https://machi15.com')
+    expect(html).toContain('Zweiter Kommentar.')
+    expect(html).toContain('Dritter Kommentar.')
+    expect(html).toContain('Vierter Kommentar.')
+    expect(html).not.toContain('Erster Kommentar.')
+  })
+
+  it('renders no comment list when there are no comments', () => {
+    expect(frameHtml(basePost, 'b1', 'https://machi15.com')).not.toContain('frame-comment-list')
+  })
+
+  it('escapes comment bodies', () => {
+    const html = frameHtml({ ...basePost, comments: [{ id: 'c1', body: '<img src=x onerror=alert(1)>' }] }, 'b1', 'https://machi15.com')
+    expect(html).not.toContain('<img src=x')
+    expect(html).toContain('&lt;img')
+  })
 })
 
 describe('submitQrUrl', () => {
