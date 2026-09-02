@@ -2,6 +2,7 @@
 
 ## 2026-09-02
 
+* **Update** — Spec 003 completed: submit page `/b/{boardId}/neu` live — German mobile-first form (category, title, body, optional contact fields, 1/2-week duration), client-side photo resize to ≤1600 px JPEG via canvas, confirmation screen with management link + QR (qrcode-generator vendored into `public/vendor/`, no QR service). TDD: 19 new tests (pure logic, jsdom wiring against the real HTML, route via assets binding) — all green locally and in production (curl 200 + POST 201). Note: photo upload itself stays in 004 (R2); resized blob is prepared client-side only. Real-phone-browser pass still open (manual).
 * **Update** — Spec 002 completed: `POST /api/posts` live in production — validation with German 400s, board existence check, per-IP rate limit (3/hour, hashed IP), anonymous management token (hashed at rest). TDD: 12 tests + live integration (201/400/429).
 * **Update** — Spec 001 completed: Worker + Hono + `/api/health` live at https://machi-15.machi-15.workers.dev (TDD red-green, D1 remote EEUR with boards/posts/comments, static assets, 404s)
 * **Decision** — Single Worker with assets binding replaces the separate Pages project (one deploy target, one domain, no CORS)
