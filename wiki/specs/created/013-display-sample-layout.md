@@ -17,16 +17,14 @@ The 55" display looks like Tom's sample board: a 9-column × 3-row grid of tiles
   * Row 2: 3 QR codes | sponsor banner | 3 QR codes (banner spans the 3 middle columns).
   * Row 3: 9 QR codes.
 * **Sponsor banner in the middle**: the image Tom provided — `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKkri_9rIga056MZrUQdYS9P_XKCM9YWNmyIaBsBVmQKFd0wEnlqgGyzg&s=10` (fetched into `public/promoter/`; if the gstatic thumbnail is too small, Tom supplies the original file).
-* **QR tiles**: scanning a QR lets passers-by post there → each QR encodes the board's submit URL.
-* **Taken tiles**: live posts replace QR tiles (feed order, newest first); a taken tile shows the post and its comment QR.
+* **QR tiles**: every tile has a UNIQUE QR (slot N → `/b/{boardId}/neu?slot=N`); scanning it posts into that tile (see [014](014-tile-slots.md)).
+* **Taken tiles**: live posts render in their tile; a taken tile shows the post (incl. photo), its comments, and a comment QR.
 * MVP = a single market (one board). Multi-board stays in the data model, out of MVP scope.
 * Header stays "Machi-Board (Display)" (verify-me wording); polling ≤30 s; offline hint; legal footer.
 
 ## Scope (this iteration)
 
-* Rework `public/display.html/js`: 9×3 CSS grid; sponsor banner (static asset, data-driven via `promoter_logo_key` → `/promoter/{key}`) at row 2, columns 4–6; QR tiles fill the remaining cells; live posts replace tiles in feed order.
-* Seed `promoter_logo_key = promoter.png` via `scripts/seed-board.mjs --remote`.
-* **Not in this iteration** (follow-up if Tom wants it): per-tile slot mapping (scan tile N → post lands in tile N). Today every QR leads to the same submit form and posts fill tiles in order.
+* Rework `public/display.html/js`: 9×3 CSS grid; sponsor banner (static asset, data-driven via `promoter_logo_key` → `/promoter/{key}`) at row 2, columns 4–6; QR tiles fill the remaining cells (unique slot URLs); live posts render in their tiles.
 
 ## Acceptance criteria
 

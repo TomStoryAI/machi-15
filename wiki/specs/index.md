@@ -6,15 +6,16 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 
 | # | Spec | Depends on |
 |---|---|---|
-| 004 | [Photo storage & serving](created/004-photo-storage.md) — **blocked: R2 not enabled on the account** | 002 |
-| 011 | [Expiry cron](created/011-expiry-cron.md) — **blocked by 004** | 004 |
-| 013 | [Display layout per Tom's sample board](created/013-display-sample-layout.md) — waiting on Tom's tile-geometry description | 007 |
+| 011 | [Expiry cron](created/011-expiry-cron.md) | 004 |
+| 013 | [Display layout per Tom's sample board](created/013-display-sample-layout.md) — awaiting Tom's visual confirmation | 007 |
+| 014 | [Tile slots — unique QR per tile](created/014-tile-slots.md) | 002, 004, 013 |
 
 ## Completed
 
 | # | Spec |
 |---|---|
 | 001 | [Repo bootstrap & deploy](completed/001-repo-bootstrap.md) |
+| 004 | [Photo storage & serving](completed/004-photo-storage.md) |
 | 002 | [Submit API](completed/002-submit-api.md) |
 | 003 | [Submit page](completed/003-submit-page.md) |
 | 005 | [Admin API & page](completed/005-admin.md) |
