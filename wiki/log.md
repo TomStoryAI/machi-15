@@ -2,6 +2,7 @@
 
 ## 2026-09-02
 
+* **Update** — Spec 002 completed: `POST /api/posts` live in production — validation with German 400s, board existence check, per-IP rate limit (3/hour, hashed IP), anonymous management token (hashed at rest). TDD: 12 tests + live integration (201/400/429).
 * **Update** — Spec 001 completed: Worker + Hono + `/api/health` live at https://machi-15.machi-15.workers.dev (TDD red-green, D1 remote EEUR with boards/posts/comments, static assets, 404s)
 * **Decision** — Single Worker with assets binding replaces the separate Pages project (one deploy target, one domain, no CORS)
 * **Note** — R2 activation pending in the Cloudflare dashboard (account-level; may ask for payment info). Unblocks spec 004.

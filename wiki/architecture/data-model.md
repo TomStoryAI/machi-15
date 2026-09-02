@@ -13,12 +13,13 @@ status: draft
 
 ## posts
 
-`id`, `board_id`, `category`, `title`, `body`, `photo_key?`, `contact_phone?`, `contact_email?`, `contact_whatsapp?`, `contact_instagram?`, `contact_address?`, `duration_weeks`, `status`, `expires_at`, `mgmt_token_hash`, `created_at`, `approved_at`
+`id`, `board_id`, `category`, `title`, `body`, `photo_key?`, `contact_phone?`, `contact_email?`, `contact_whatsapp?`, `contact_instagram?`, `contact_address?`, `duration_weeks`, `status`, `expires_at`, `mgmt_token_hash`, `ip_hash`, `created_at`, `approved_at`
 
 * `status`: `pending | live | rejected | expired`
 * `duration_weeks`: 1 or 2
 * `photo_key`: R2 object key, nullable (text-only ads)
 * `mgmt_token_hash`: management token stored hashed — anonymous poster management (view comments / delete)
+* `ip_hash`: SHA-256 of the poster's IP for rate limiting — the raw IP is never stored
 
 ## comments
 
