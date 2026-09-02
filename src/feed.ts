@@ -32,25 +32,14 @@ feedRoutes.get('/api/boards/:boardId/feed', async (c) => {
     )
     .bind(boardId)
     .all<FeedPostRow>()
-  const comments = await db
-    .prepare(
-      `SELECT c.id, c.post_id, c.body, c.created_at
-       FROM comments c JOIN posts p ON p.id = c.post_id
-       WHERE p.board_id = ? AND c.status = 'live' AND p.status = 'live' ORDER BY c.created_at`,
-    )
-    .bind(boardId)
-    .all<FeedCommentRow>()
 
   const now = Date.now()
-  const commentRows = comments.results ?? []
+  // Comments are private (poster page only, spec 009 revised 2026-09-02) — never in the public feed.
   const livePosts = (posts.results ?? [])
     .filter((p) => !p.expires_at || new Date(p.expires_at).getTime() > now)
     .map((p) => ({
       ...mapPost(p),
       approvedAt: p.approved_at,
-      comments: commentRows
-        .filter((c) => c.post_id === p.id)
-        .map((c) => ({ id: c.id, body: c.body, createdAt: c.created_at })),
     }))
 
   return c.json({

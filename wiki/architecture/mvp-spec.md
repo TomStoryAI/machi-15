@@ -45,7 +45,7 @@ This page is the **overview contract**. Implementation proceeds as small numbere
 * **Board grid: 3 rows × 9 columns of tiles** (Tom, 2026-09-02): row 1 = 9 QR codes; row 2 = 3 QRs | sponsor banner (spans the middle 3 columns) | 3 QRs; row 3 = 9 QR codes. See spec 013.
 * **Sponsor banner in the middle**: Tom's image (`public/promoter/promoter.png`, source: gstatic URL in spec 013) + name REWE FAMILIE SCHULZE / slogan "Mehr Nähe geht nicht." (wording to verify)
 * **QR tiles**: every empty tile is a QR → `/b/{boardId}/neu` (scan → post there)
-* **Taken tiles**: live posts replace QR tiles in feed order (newest first); taken tiles show title/body/photo/contacts/comment count + their comment QR
+* **Taken tiles**: live posts replace QR tiles in feed order (newest first); taken tiles show title/body/photo/contacts + their comment QR (comments themselves are private, never on the board)
 * Polls the feed every 20–30 s; works offline-ish (last feed cached, subtle offline hint)
 * 55" legibility: large type, high contrast, readable from a few meters
 * **MVP = a single market (one board)** — Tom's decision 2026-09-02; multi-board stays in the data model, out of MVP scope
@@ -66,7 +66,7 @@ This page is the **overview contract**. Implementation proceeds as small numbere
 | Method | Path | Purpose |
 |---|---|---|
 | POST | `/api/posts` | create ad — validate, size checks, per-IP rate limit, store photo in R2 |
-| GET | `/api/boards/{id}/feed` | live posts + approved comments (display) |
+| GET | `/api/boards/{id}/feed` | live posts (comments are private — poster page only) |
 | POST | `/api/posts/{id}/comments` | add comment (rate-limited, pending) |
 | GET | `/api/posts/{id}?t={token}` | poster view (status + comments) |
 | DELETE | `/api/posts/{id}?t={token}` | poster deletes own ad |
@@ -98,7 +98,7 @@ See [data-model.md](data-model.md). `boards` carries promoter fields (`promoter_
 
 1. Viewer scans the small QR on a live frame → comment form for that post
 2. Comment lands `pending` in the same moderation queue
-3. Approved → appears under the frame within ≤30 s
+3. Approved → visible to the POSTER on their management page (`/p/{postId}?t={token}`). Comments are private — the public board never shows them (Tom, 2026-09-02).
 
 ### P3 — Poster sichtet Kommentare / löscht
 

@@ -6,9 +6,11 @@ description: Approved comments appear under their frame on the board.
 
 # 009 — Comments on display
 
+> **Superseded (Tom, 2026-09-02):** comments are PRIVATE between commenter and poster. The public board never shows comments — not the bodies, not a count. The poster sees approved comments only on their management page (`/p/{postId}?t={token}`). Comments were removed from the display and from the public feed entirely.
+
 ## Goal
 
-Approved comments are readable under the frame on the 55" screen.
+~~Approved comments are readable under the frame on the 55" screen.~~ (Superseded — see note above.)
 
 ## Scope
 

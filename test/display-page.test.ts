@@ -36,10 +36,6 @@ const feedV1 = {
   posts: [
     post('p1', 'Biete: Gassi gehen', 'Für Hunde in der Nachbarschaft.', {
       contactPhone: '0151 123',
-      comments: [
-        { id: 'c1', body: 'Toller Post!' },
-        { id: 'c2', body: 'Ja, gerne!' },
-      ],
       slot: 7,
     }),
     post('p2', 'Suche: Katze', 'Entlaufen.', { photoKey: 'k2' }),

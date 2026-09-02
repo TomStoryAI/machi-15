@@ -38,7 +38,7 @@ const board = {
 }
 
 describe('frameHtml', () => {
-  it('renders title, body, contacts and comment count', () => {
+  it('renders title, body and contacts', () => {
     const html = frameHtml(
       {
         ...basePost,
@@ -51,12 +51,17 @@ describe('frameHtml', () => {
     expect(html).toContain('Biete: Gassi gehen')
     expect(html).toContain('Für Hunde in der Nachbarschaft.')
     expect(html).toContain('Tel.: 0151 123')
-    expect(html).toContain('2 Kommentare')
   })
 
-  it('uses the singular for one comment and hides the badge for none', () => {
-    expect(frameHtml({ ...basePost, comments: [{ id: 'c1' }] }, 'b1', 'https://machi15.com')).toContain('1 Kommentar')
-    expect(frameHtml(basePost, 'b1', 'https://machi15.com')).not.toContain('Kommentar')
+  it('never renders comments or a comment count on the public board', () => {
+    const html = frameHtml(
+      { ...basePost, comments: [{ id: 'c1', body: 'Geheimer Kommentar.' }] },
+      'b1',
+      'https://machi15.com',
+    )
+    expect(html).not.toContain('Geheimer Kommentar.')
+    expect(html).not.toContain('Kommentar')
+    expect(html).not.toContain('frame-comment-list')
   })
 
   it('escapes user text', () => {
@@ -79,28 +84,10 @@ describe('frameHtml', () => {
     expect(html).toContain('frame-qr')
   })
 
-  it('renders the latest 3 approved comments under the frame', () => {
-    const comments = [
-      { id: 'c1', body: 'Erster Kommentar.' },
-      { id: 'c2', body: 'Zweiter Kommentar.' },
-      { id: 'c3', body: 'Dritter Kommentar.' },
-      { id: 'c4', body: 'Vierter Kommentar.' },
-    ]
-    const html = frameHtml({ ...basePost, comments }, 'b1', 'https://machi15.com')
-    expect(html).toContain('Zweiter Kommentar.')
-    expect(html).toContain('Dritter Kommentar.')
-    expect(html).toContain('Vierter Kommentar.')
-    expect(html).not.toContain('Erster Kommentar.')
-  })
-
-  it('renders no comment list when there are no comments', () => {
-    expect(frameHtml(basePost, 'b1', 'https://machi15.com')).not.toContain('frame-comment-list')
-  })
-
-  it('escapes comment bodies', () => {
-    const html = frameHtml({ ...basePost, comments: [{ id: 'c1', body: '<img src=x onerror=alert(1)>' }] }, 'b1', 'https://machi15.com')
-    expect(html).not.toContain('<img src=x')
-    expect(html).toContain('&lt;img')
+  it('keeps the frame QR for commenting even though comments are private', () => {
+    const html = frameHtml(basePost, 'b1', 'https://machi15.com')
+    expect(html).toContain('/b/b1/p/p1')
+    expect(html).toContain('frame-qr')
   })
 })
 

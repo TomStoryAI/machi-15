@@ -80,12 +80,11 @@ describe('GET /api/boards/{id}/feed', () => {
     expect(ids).not.toContain('p-rejected')
   })
 
-  it('includes only approved comments of live posts', async () => {
+  it('never exposes comments in the public feed (private between commenter and poster)', async () => {
     const json = await (await feed()).json()
-    const pNew = json.posts.find((p: { id: string }) => p.id === 'p-new')
-    expect(pNew.comments.map((c: { id: string }) => c.id)).toEqual(['c-live'])
-    expect(pNew.comments[0].body).toBe('Toller Post!')
-    expect(json.posts.find((p: { id: string }) => p.id === 'p-old').comments).toEqual([])
+    for (const p of json.posts) {
+      expect(p.comments).toBeUndefined()
+    }
   })
 
   it('returns a German 404 for an unknown board', async () => {
