@@ -100,6 +100,16 @@ describe('POST /api/posts/{id}/photo', () => {
     expect(res.status).toBe(400)
     expect((await res.json()).error).toContain('groß')
   })
+
+  it('stores a real-size photo (~450 KB) without blowing the stack', async () => {
+    const bytes = new Uint8Array(450 * 1024)
+    for (let i = 0; i < bytes.length; i++) bytes[i] = i % 251
+    const res = await upload('p-no-photo', TOKEN, new File([bytes], 'foto.jpg', { type: 'image/jpeg' }))
+    expect(res.status).toBe(201)
+    const photoKey = (await res.json()).photoKey
+    const stored = db._state().photos.find((p) => p.key === photoKey)!
+    expect(stored.data_base64.length).toBeGreaterThan(400 * 1024)
+  })
 })
 
 describe('GET /api/photos/{key}', () => {

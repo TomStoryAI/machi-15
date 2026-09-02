@@ -12,6 +12,17 @@ type PhotoStore = {
   get: (key: string) => Promise<{ data: ArrayBuffer; contentType: string | null } | null>
 }
 
+// Chunked: spreading a full photo into String.fromCharCode(...) overflows the
+// call stack at real photo sizes (RangeError at ~450 KB).
+function bytesToBase64(bytes: Uint8Array): string {
+  const CHUNK = 0x8000
+  let bin = ''
+  for (let i = 0; i < bytes.length; i += CHUNK) {
+    bin += String.fromCharCode(...bytes.subarray(i, i + CHUNK))
+  }
+  return btoa(bin)
+}
+
 // D1 interim: photos live in the `photos` table as base64 (spec 004, R2 needs card on file).
 // R2 end state: same interface against the PHOTOS binding — no caller changes.
 function photoStore(env: { PHOTOS?: R2Bucket; DB: D1Database }): PhotoStore {
@@ -29,7 +40,7 @@ function photoStore(env: { PHOTOS?: R2Bucket; DB: D1Database }): PhotoStore {
   }
   return {
     async put(key, postId, contentType, data) {
-      const base64 = btoa(String.fromCharCode(...new Uint8Array(data)))
+      const base64 = bytesToBase64(new Uint8Array(data))
       await env.DB.prepare('INSERT INTO photos (key, post_id, content_type, data_base64) VALUES (?, ?, ?, ?)')
         .bind(key, postId, contentType, base64)
         .run()
