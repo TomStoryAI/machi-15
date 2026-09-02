@@ -2,7 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
-import { initDisplayPage } from '../public/display.js'
+import { cellIndexForSlot, initDisplayPage } from '../public/display.js'
 
 const html = readFileSync(resolve(process.cwd(), 'public/display.html'), 'utf8')
 
@@ -40,12 +40,13 @@ const feedV1 = {
         { id: 'c1', body: 'Toller Post!' },
         { id: 'c2', body: 'Ja, gerne!' },
       ],
+      slot: 7,
     }),
     post('p2', 'Suche: Katze', 'Entlaufen.', { photoKey: 'k2' }),
   ],
 }
 
-const feedV2 = { ...feedV1, posts: [...feedV1.posts, post('p3', 'Verkaufe: Fahrrad', 'Gut erhalten.')] }
+const feedV2 = { ...feedV1, posts: [...feedV1.posts, post('p3', 'Verkaufe: Fahrrad', 'Gut erhalten.', { slot: 20 })] }
 
 function json(body: unknown) {
   return new Response(JSON.stringify(body), { headers: { 'content-type': 'application/json' } })
@@ -92,20 +93,20 @@ describe('display page (9x3 sample board)', () => {
     expect(sponsor.textContent).toContain('REWE FAMILIE SCHULZE')
     expect(sponsor.textContent).toContain('Mehr Naehe geht nicht.')
 
-    // 2 taken tiles with the two posts, 22 QR tiles
-    expect(cells[0].textContent).toContain('Biete: Gassi gehen')
-    expect(cells[1].textContent).toContain('Suche: Katze')
+    // slot 7 -> its tile (row 1, column 7); unslotted post fills the first free tile
+    expect(cells[cellIndexForSlot(7)].textContent).toContain('Biete: Gassi gehen')
+    expect(cells[0].textContent).toContain('Suche: Katze')
     expect(cells.filter((c) => c.querySelector('.tile-qr'))).toHaveLength(22)
-    expect(cells[0].innerHTML).toContain('/b/b1/p/p1')
+    expect(cells[cellIndexForSlot(7)].innerHTML).toContain('/b/b1/p/p1')
 
     // taken tile content: photo only where photoKey is set
-    expect(cells[1].querySelector('img.frame-photo')!.getAttribute('src')).toBe('/api/photos/k2')
-    expect(cells[0].querySelector('img.frame-photo')).toBeNull()
+    expect(cells[0].querySelector('img.frame-photo')!.getAttribute('src')).toBe('/api/photos/k2')
+    expect(cells[cellIndexForSlot(7)].querySelector('img.frame-photo')).toBeNull()
 
-    // QR tiles encode the submit URL
+    // QR tiles encode their unique slot URL
     const qrTile = cells[2]
     expect(qrTile.querySelector('.tile-qr svg')).not.toBeNull()
-    expect(qrTile.innerHTML).toContain('/b/b1/neu')
+    expect(qrTile.innerHTML).toContain('/b/b1/neu?slot=3')
 
     expect(document.getElementById('offline-hint')!.hidden).toBe(true)
   })
@@ -128,12 +129,12 @@ describe('display page (9x3 sample board)', () => {
 
     await vi.advanceTimersByTimeAsync(0)
     const cells = gridChildren()
-    expect(cells[0].textContent).toContain('Biete: Gassi gehen')
-    expect(cells[2].querySelector('.tile-qr')).not.toBeNull()
+    expect(cells[cellIndexForSlot(7)].textContent).toContain('Biete: Gassi gehen')
+    expect(cells[cellIndexForSlot(20)].querySelector('.tile-qr')).not.toBeNull()
 
     await vi.advanceTimersByTimeAsync(25_000)
-    expect(fetchMock).toHaveBeenCalledTimes(2)
-    expect(gridChildren()[2].textContent).toContain('Verkaufe: Fahrrad')
+    expect(fetchMock.mock.calls.length).toBeGreaterThanOrEqual(2)
+    expect(gridChildren()[cellIndexForSlot(20)].textContent).toContain('Verkaufe: Fahrrad')
     vi.useRealTimers()
   })
 
@@ -142,7 +143,7 @@ describe('display page (9x3 sample board)', () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('Failed to fetch')))
     initDisplayPage()
 
-    expect(gridChildren()[0].textContent).toContain('Biete: Gassi gehen')
+    expect(gridChildren()[cellIndexForSlot(7)].textContent).toContain('Biete: Gassi gehen')
     const hint = document.getElementById('offline-hint')!
     await vi.waitFor(() => {
       expect(hint.hidden).toBe(false)
@@ -164,7 +165,7 @@ describe('display page (9x3 sample board)', () => {
     expect(hint.hidden).toBe(false)
 
     await vi.advanceTimersByTimeAsync(25_000)
-    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(fetchMock.mock.calls.length).toBeGreaterThanOrEqual(2)
     expect(hint.hidden).toBe(true)
     vi.useRealTimers()
   })

@@ -37,7 +37,7 @@ beforeAll(() => {
       promoter_slogan: 'Mehr Naehe geht nicht.',
     },
     posts: [
-      post('p-new', { approved_at: '2026-09-02 12:00:00' }),
+      post('p-new', { approved_at: '2026-09-02 12:00:00', slot: 7 }),
       post('p-old', { approved_at: '2026-09-01 08:00:00' }),
       post('p-expired', { expires_at: '2026-08-01T12:00:00.000Z' }),
       post('p-pending', { status: 'pending', approved_at: null, expires_at: null }),
@@ -69,6 +69,7 @@ describe('GET /api/boards/{id}/feed', () => {
     })
     expect(json.posts.map((p: { id: string }) => p.id)).toEqual(['p-new', 'p-old'])
     expect(json.posts[0].title).toBe('Titel p-new')
+    expect(json.posts[0].slot).toBe(7)
   })
 
   it('never includes expired, pending or rejected posts', async () => {

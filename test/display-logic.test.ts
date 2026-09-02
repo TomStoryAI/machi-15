@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { boardIdFromPath, buildBoardHtml, frameHtml, qrTileHtml, submitQrUrl } from '../public/display.js'
+import { boardIdFromPath, buildBoardHtml, cellIndexForSlot, frameHtml, qrTileHtml, submitQrUrl } from '../public/display.js'
 
 describe('boardIdFromPath (display)', () => {
   it('extracts the board id from /b/{id}', () => {
@@ -131,21 +131,42 @@ describe('buildBoardHtml (9x3 sample board)', () => {
     expect(cells.filter((c) => c.includes('tile-qr'))).toHaveLength(24)
   })
 
-  it('fills taken tiles with live posts in feed order', () => {
+  it('renders a post in exactly its slot (slot 7 = row 1, column 7)', () => {
+    const cells = buildBoardHtml([{ ...basePost, slot: 7 }], 'b1', 'https://machi15.com', board)
+    expect(cells[cellIndexForSlot(7)]).toContain('Biete: Gassi gehen')
+    expect(cells[cellIndexForSlot(7)]).not.toContain('tile-qr')
+    expect(cells[0].includes('tile-qr')).toBe(true)
+  })
+
+  it('maps slots after the sponsor banner correctly (slot 20 -> cell 17)', () => {
+    expect(cellIndexForSlot(20)).toBe(17)
+    expect(cellIndexForSlot(13)).toBe(-1)
+    const cells = buildBoardHtml([{ ...basePost, slot: 20 }], 'b1', 'https://machi15.com', board)
+    expect(cells[17]).toContain('Biete: Gassi gehen')
+  })
+
+  it('fills remaining free tiles with unslotted posts in feed order', () => {
     const p2 = { ...basePost, id: 'p2', title: 'Suche: Katze', body: 'Entlaufen.' }
-    const cells = buildBoardHtml([basePost, p2], 'b1', 'https://machi15.com', board)
-    expect(cells[0]).toContain('Biete: Gassi gehen')
-    expect(cells[1]).toContain('Suche: Katze')
-    // taken tiles still carry their comment QR
-    expect(cells[0]).toContain('/b/b1/p/p1')
+    const cells = buildBoardHtml([{ ...basePost, slot: 7 }, p2], 'b1', 'https://machi15.com', board)
+    expect(cells[6]).toContain('Biete: Gassi gehen')
+    expect(cells[0]).toContain('Suche: Katze')
     expect(cells.filter((c) => c.includes('tile-qr'))).toHaveLength(22)
   })
 
-  it('keeps QR tiles scannable to the submit page', () => {
+  it('keeps every QR tile unique, encoding its own slot', () => {
     const cells = buildBoardHtml([], 'b1', 'https://machi15.com', board)
-    for (const c of cells) {
-      if (c.includes('tile-qr')) expect(c).toContain('/b/b1/neu')
-    }
+    const qrTiles = cells.filter((c) => c.includes('tile-qr'))
+    expect(qrTiles).toHaveLength(24)
+    const urls = qrTiles.map((c) => c.match(/>([^<]*)<\/title>/)?.[1])
+    expect(new Set(urls).size).toBe(24)
+    expect(cells[2]).toContain('?slot=3')
+    expect(cells[6]).toContain('?slot=7')
+  })
+
+  it('never places a post in the sponsor cells', () => {
+    const cells = buildBoardHtml([{ ...basePost, slot: 13 }], 'b1', 'https://machi15.com', board)
+    expect(cells[12]).toContain('sponsor')
+    expect(cells.some((c) => c.includes('Biete: Gassi gehen'))).toBe(false)
   })
 
   it('works with more posts than tiles: extra posts are dropped, board stays a QR-first grid', () => {

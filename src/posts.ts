@@ -9,6 +9,11 @@ const BODY_MAX = 500
 const CONTACT_MAX = 200
 const HOURLY_POST_LIMIT = 3
 
+// Tile slots of the 9x3 board (spec 014). Tiles 13-15 belong to the sponsor banner.
+export const SLOT_MIN = 1
+export const SLOT_MAX = 27
+export const SPONSOR_SLOTS = [13, 14, 15]
+
 export type PostInput = {
   boardId: string
   category: string
@@ -20,6 +25,7 @@ export type PostInput = {
   contactWhatsapp?: string
   contactInstagram?: string
   contactAddress?: string
+  slot?: number
 }
 
 type ValidationResult = { ok: true; value: PostInput } | { ok: false; error: string }
@@ -56,6 +62,14 @@ export function validatePostInput(input: unknown): ValidationResult {
     }
   }
 
+  // Optional tile slot (spec 014): when present it must address a real tile.
+  let slot: number | undefined
+  if (b.slot !== undefined && b.slot !== null && b.slot !== '') {
+    slot = Number(b.slot)
+    const valid = Number.isInteger(slot) && slot >= SLOT_MIN && slot <= SLOT_MAX && !SPONSOR_SLOTS.includes(slot)
+    if (!valid) return { ok: false, error: 'Bitte wähle ein gültiges Feld.' }
+  }
+
   return {
     ok: true,
     value: {
@@ -64,6 +78,7 @@ export function validatePostInput(input: unknown): ValidationResult {
       title,
       body,
       durationWeeks,
+      slot,
       ...Object.fromEntries(contactFields.map((f) => [f, str(b[f]) || undefined])),
     },
   }
@@ -87,8 +102,8 @@ export async function insertPost(db: D1Database, value: PostInput, ipHash: strin
   await db
     .prepare(
       `INSERT INTO posts (id, board_id, category, title, body, contact_phone, contact_email, contact_whatsapp,
-        contact_instagram, contact_address, duration_weeks, status, mgmt_token_hash, ip_hash)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`,
+        contact_instagram, contact_address, duration_weeks, status, mgmt_token_hash, ip_hash, slot)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)`,
     )
     .bind(
       id,
@@ -104,6 +119,7 @@ export async function insertPost(db: D1Database, value: PostInput, ipHash: strin
       value.durationWeeks,
       tokenHash,
       ipHash,
+      value.slot ?? null,
     )
     .run()
   return id
@@ -119,6 +135,17 @@ postsRoutes.post('/api/posts', async (c) => {
 
   if (!(await boardExists(db, v.value.boardId))) {
     return c.json({ error: 'Brett nicht gefunden.' }, 400)
+  }
+
+  // A scanned tile QR reserves exactly that tile: reject when another pending/live post holds it.
+  if (v.value.slot !== undefined) {
+    const occupied = await db
+      .prepare(`SELECT id FROM posts WHERE board_id = ? AND slot = ? AND status IN ('pending', 'live') LIMIT 1`)
+      .bind(v.value.boardId, v.value.slot)
+      .first()
+    if (occupied) {
+      return c.json({ error: 'Dieses Feld ist leider schon belegt.' }, 409)
+    }
   }
 
   const ip = (c.req.header('cf-connecting-ip') ?? 'local').split(',')[0].trim()

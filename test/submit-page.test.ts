@@ -128,6 +128,24 @@ describe('submit page form', () => {
     expect((document.getElementById('mgmt-link') as HTMLAnchorElement).href).toBe(`${location.origin}/p/p2?t=t2`)
   })
 
+  it('sends the slot from the URL with the post payload', async () => {
+    history.replaceState(null, '', '/b/b1/neu?slot=7')
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(201, { postId: 'p1', mgmtToken: 'tok' }))),
+    )
+    initSubmitPage()
+    fillForm()
+
+    await vi.waitFor(() => {
+      expect(getFetch()).toHaveBeenCalled()
+    })
+    const postCall = getFetch().mock.calls.find(([url]) => url === '/api/posts')!
+    const payload = JSON.parse(postCall[1].body)
+    expect(payload.slot).toBe(7)
+    expect(payload.boardId).toBe('b1')
+  })
+
   it('uploads a selected photo to the created post with the management token', async () => {
     vi.stubGlobal('createImageBitmap', vi.fn().mockResolvedValue({ width: 800, height: 600, close: vi.fn() }))
     vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {

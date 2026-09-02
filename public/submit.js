@@ -32,6 +32,8 @@ export function buildPayload(boardId, values) {
     body: String(values.body).trim(),
     durationWeeks: Number(values.durationWeeks),
   }
+  const slot = Number(values.slot)
+  if (Number.isInteger(slot)) payload.slot = slot
   for (const field of CONTACT_FIELDS) {
     const v = String(values[field] ?? '').trim()
     if (v) payload[field] = v
@@ -109,7 +111,11 @@ export function initSubmitPage() {
     event.preventDefault()
     errorBox.hidden = true
     const fd = new FormData(form)
-    const payload = buildPayload(boardId, Object.fromEntries(fd.entries()))
+    const values = Object.fromEntries(fd.entries())
+    // Tile QR: /b/{boardId}/neu?slot=N posts into that tile (spec 014).
+    const slotParam = new URLSearchParams(location.search).get('slot')
+    if (slotParam) values.slot = slotParam
+    const payload = buildPayload(boardId, values)
     const res = await postWithRetry('/api/posts', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },

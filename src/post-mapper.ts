@@ -1,7 +1,7 @@
 // Shared mapping of posts rows (snake_case D1) to API shape (camelCase JSON).
 
 export const POST_COLUMNS =
-  'id, category, title, body, photo_key, contact_phone, contact_email, contact_whatsapp, contact_instagram, contact_address, duration_weeks, created_at'
+  'id, category, title, body, photo_key, contact_phone, contact_email, contact_whatsapp, contact_instagram, contact_address, duration_weeks, slot, created_at'
 
 export type PostRow = {
   id: string
@@ -15,6 +15,7 @@ export type PostRow = {
   contact_instagram: string | null
   contact_address: string | null
   duration_weeks: number
+  slot?: number | null
   created_at: string
 }
 
@@ -31,6 +32,7 @@ export function mapPost(row: PostRow) {
     contactInstagram: row.contact_instagram,
     contactAddress: row.contact_address,
     durationWeeks: row.duration_weeks,
+    slot: row.slot ?? null,
     createdAt: row.created_at,
   }
 }

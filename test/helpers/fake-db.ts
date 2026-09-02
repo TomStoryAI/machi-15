@@ -28,6 +28,7 @@ export type FakePost = {
   approved_at: string | null
   created_at: string
   mgmt_token_hash?: string
+  slot?: number | null
 }
 export type FakeComment = { id: string; post_id: string; body: string; status: 'pending' | 'live' | 'rejected'; created_at: string }
 export type FakeSession = { token_hash: string; board_id: string; expires_at: string }
@@ -79,6 +80,15 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
     if (query.includes('SELECT duration_weeks FROM posts')) {
       const post = posts.find((p) => p.id === bound[0] && p.board_id === bound[1])
       return post ? { duration_weeks: post.duration_weeks } : null
+    }
+    if (query.includes('slot = ?')) {
+      const post = posts.find(
+        (p) =>
+          p.board_id === bound[0] &&
+          p.slot === bound[1] &&
+          (p.status === 'pending' || p.status === 'live'),
+      )
+      return post ? { id: post.id } : null
     }
     if (query.includes('photo_key = ?')) {
       const post = posts.find((p) => p.photo_key === bound[0])
@@ -133,6 +143,30 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
   }
 
   function runMutation(query: string): number {
+    if (query.startsWith('INSERT INTO posts')) {
+      // binds: id, boardId, category, title, body, contact..., durationWeeks, tokenHash, ipHash, slot
+      posts.push({
+        id: bound[0] as string,
+        board_id: bound[1] as string,
+        category: bound[2] as string,
+        title: bound[3] as string,
+        body: bound[4] as string,
+        photo_key: null,
+        contact_phone: (bound[5] as string) ?? null,
+        contact_email: (bound[6] as string) ?? null,
+        contact_whatsapp: (bound[7] as string) ?? null,
+        contact_instagram: (bound[8] as string) ?? null,
+        contact_address: (bound[9] as string) ?? null,
+        duration_weeks: bound[10] as number,
+        status: 'pending',
+        expires_at: null,
+        approved_at: null,
+        created_at: '2026-09-02 12:00:00',
+        mgmt_token_hash: bound[11] as string,
+        slot: (bound[13] as number | null) ?? null,
+      })
+      return 1
+    }
     if (query.startsWith('INSERT INTO photos')) {
       photos.push({ key: bound[0] as string, post_id: bound[1] as string, content_type: bound[2] as string, data_base64: bound[3] as string })
       return 1

@@ -53,6 +53,14 @@ export function qrTileHtml(submitUrl) {
   return `<div class="tile"><div class="tile-qr">${qrSvg(submitUrl, 4, 2)}</div></div>`
 }
 
+// 1-based tile number -> index in the rendered cell array (sponsor spans 3 cells, so
+// tiles after it shift by 2). Sponsor cells return -1.
+export function cellIndexForSlot(slot) {
+  if (slot < 13) return slot - 1
+  if (slot > 15) return slot - 3
+  return -1
+}
+
 export function sponsorHtml(board) {
   const logo = board.promoterLogoKey
     ? `<img class="promoter-logo" src="/promoter/${esc(board.promoterLogoKey)}" alt="${esc(board.promoterName ?? '')}" />`
@@ -66,18 +74,30 @@ export function sponsorHtml(board) {
 }
 
 // One cell per DOM element: 24 tiles + 1 sponsor (spanning 3 grid cells) = 25 elements.
-// Live posts fill tile cells in feed order (newest first); the rest stay scannable QRs.
+// Posts with a slot render in exactly that tile; unslotted posts fill free tiles in
+// feed order (spec 014). Every QR tile encodes its own slot so a scan posts into that tile.
 export function buildBoardHtml(posts, boardId, origin, board) {
   const submitUrl = submitQrUrl(origin, boardId)
+  const bySlot = new Map()
+  const unslotted = []
+  for (const p of posts) {
+    if (Number.isInteger(p.slot) && p.slot >= 1 && p.slot <= 27 && !bySlot.has(p.slot)) {
+      bySlot.set(p.slot, p)
+    } else {
+      unslotted.push(p)
+    }
+  }
   const cells = []
-  let p = 0
+  let u = 0
   for (let i = 0; i < GRID_COLS * GRID_ROWS; i++) {
     if (i === SPONSOR_POSITION) {
       cells.push(sponsorHtml(board))
       i += 2 // the banner covers three columns
       continue
     }
-    cells.push(p < posts.length ? frameHtml(posts[p++], boardId, origin) : qrTileHtml(submitUrl))
+    const slot = i + 1 // 1-based tile number
+    const post = bySlot.get(slot) ?? unslotted[u++]
+    cells.push(post ? frameHtml(post, boardId, origin) : qrTileHtml(`${submitUrl}?slot=${slot}`))
   }
   return cells
 }
