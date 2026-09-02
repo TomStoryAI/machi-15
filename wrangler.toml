@@ -1,0 +1,15 @@
+name = "machi-15"
+main = "src/index.ts"
+compatibility_date = "2026-09-02"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "machi15-db"
+
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "machi15-photos"
+
+[assets]
+directory = "public"
+binding = "ASSETS"
