@@ -2,6 +2,7 @@
 
 ## 2026-09-02
 
+* **Decision** — React reconsidered for the frontend and rejected for the MVP: all four pages stay vanilla HTML/CSS/JS (TV-browser safety on the display, no build step, smallest failure surface). Revisit when the admin grows or platform features arrive.
 * **Update** — Specs reorganized into `created/` and `completed/` folders — the folder is the state (replaces the frontmatter status field)
 * **Decision** — Spec workflow: small numbered specs in wiki/specs/ (001–012), status `created` → `completed`, built in number order
 * **Creation** — wiki/specs/ created: 12 numbered specs + roadmap index (001 bootstrap → 012 legal/seed)
