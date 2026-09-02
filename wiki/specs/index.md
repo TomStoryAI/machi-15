@@ -8,7 +8,6 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 |---|---|---|
 | 011 | [Expiry cron](created/011-expiry-cron.md) | 004 |
 | 013 | [Display layout per Tom's sample board](created/013-display-sample-layout.md) — awaiting Tom's visual confirmation | 007 |
-| 014 | [Tile slots — unique QR per tile](created/014-tile-slots.md) | 002, 004, 013 |
 
 ## Completed
 
@@ -25,5 +24,6 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 | 009 | [Comments on display](completed/009-comments-display.md) |
 | 010 | [Poster page](completed/010-poster-page.md) |
 | 012 | [Legal pages & board seed](completed/012-legal-board-seed.md) |
+| 014 | [Tile slots — unique QR per tile](completed/014-tile-slots.md) |
 
 Overview contract: [wiki/architecture/mvp-spec.md](../architecture/mvp-spec.md)
