@@ -1,24 +1,9 @@
 // Admin page logic — vanilla ES module, no build step.
+import { contactsLine, esc } from './ui.js'
+
 export function boardIdFromAdminPath(pathname) {
   const m = pathname.match(/^\/admin\/([^/]+)\/?$/)
   return m ? decodeURIComponent(m[1]) : null
-}
-
-function esc(value) {
-  return String(value).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch])
-}
-
-const CONTACT_LABELS = [
-  ['contactPhone', 'Tel.'],
-  ['contactWhatsapp', 'WhatsApp'],
-  ['contactEmail', 'E-Mail'],
-  ['contactInstagram', 'Instagram'],
-  ['contactAddress', 'Adresse'],
-]
-
-function contactsLine(post) {
-  const parts = CONTACT_LABELS.filter(([key]) => post[key]).map(([key, label]) => `${label}: ${esc(post[key])}`)
-  return parts.length ? `<p class="contacts">${parts.join(' · ')}</p>` : ''
 }
 
 function postCard(post) {

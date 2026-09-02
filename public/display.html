@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Machi-Board (Display)</title>
+    <style>
+      /* 55" TV display: large type, high contrast, readable from a few meters. */
+      :root {
+        --bg: #ffffff;
+        --ink: #111111;
+        --muted: #4a4a4a;
+        --accent: #0b6e4f;
+        --line: #d8d8d8;
+        --card: #f7f7f5;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 24px;
+      }
+      body {
+        margin: 0;
+        padding: 1.5rem 2rem;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.4;
+        min-height: 100vh;
+      }
+      header {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 2.4rem;
+        letter-spacing: 0.01em;
+      }
+      .offline {
+        margin: 0;
+        font-size: 0.85rem;
+        color: var(--muted);
+        background: #fdf0d8;
+        border-radius: 999px;
+        padding: 0.3rem 1rem;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 22rem;
+        gap: 1.5rem;
+        align-items: start;
+      }
+      .frames {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+        gap: 1.25rem;
+      }
+      .frame {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.9rem;
+        padding: 1.1rem 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .frame-title {
+        margin: 0;
+        font-size: 1.35rem;
+        font-weight: 700;
+      }
+      .frame-body {
+        margin: 0;
+        font-size: 1.05rem;
+        overflow-wrap: anywhere;
+      }
+      .frame-photo {
+        width: 100%;
+        max-height: 14rem;
+        object-fit: cover;
+        border-radius: 0.6rem;
+      }
+      .contacts {
+        margin: 0;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+      .frame-comments {
+        align-self: flex-start;
+        font-size: 0.85rem;
+        font-weight: 600;
+        background: #e7efe9;
+        color: var(--accent);
+        border-radius: 999px;
+        padding: 0.15rem 0.8rem;
+        margin-top: auto;
+      }
+      .empty {
+        color: var(--muted);
+        font-style: italic;
+        font-size: 1.2rem;
+      }
+      .side {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+      .qr-tile {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.9rem;
+        padding: 1.25rem;
+        text-align: center;
+      }
+      #qr-box svg {
+        width: 100%;
+        max-width: 16rem;
+        height: auto;
+      }
+      .qr-caption {
+        margin: 0.75rem 0 0;
+        font-size: 1.15rem;
+        font-weight: 700;
+      }
+      .promoter-tile {
+        margin-top: auto;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.9rem;
+        padding: 1.25rem;
+        text-align: center;
+      }
+      .promoter-logo {
+        max-width: 10rem;
+        max-height: 6rem;
+        margin-bottom: 0.5rem;
+      }
+      .promoter-name {
+        display: block;
+        font-size: 1.3rem;
+        font-weight: 700;
+      }
+      .promoter-slogan {
+        display: block;
+        font-size: 1rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Machi-Board (Display)</h1>
+      <p id="offline-hint" class="offline" hidden>Offline – zeige den letzten Stand.</p>
+    </header>
+    <main class="layout">
+      <section id="frames" class="frames"></section>
+      <aside class="side">
+        <div id="qr-tile" class="qr-tile">
+          <div id="qr-box"></div>
+          <p class="qr-caption">Starte hier Dein kostenloses Inserat!</p>
+        </div>
+        <div id="promoter-tile" class="promoter-tile"></div>
+      </aside>
+    </main>
+    <script type="module">
+      import { initDisplayPage } from '/display.js'
+      initDisplayPage()
+    </script>
+  </body>
+</html>

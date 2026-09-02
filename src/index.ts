@@ -15,6 +15,11 @@ app.get('/b/:boardId/neu', async (c) => {
   return c.env.ASSETS.fetch(new Request(new URL('/submit.html', c.req.url)))
 })
 
+// TV display page, same pattern.
+app.get('/b/:boardId', async (c) => {
+  return c.env.ASSETS.fetch(new Request(new URL('/display.html', c.req.url)))
+})
+
 // Admin page, same pattern.
 app.get('/admin/:boardId', async (c) => {
   return c.env.ASSETS.fetch(new Request(new URL('/admin.html', c.req.url)))

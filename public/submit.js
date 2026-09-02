@@ -1,6 +1,7 @@
 // Submit page logic — vanilla ES module, no build step.
 // Pure helpers are exported so Vitest can exercise them directly.
-import qrcode from './vendor/qrcode.mjs'
+import { qrSvg } from './qr.js'
+export { qrSvg }
 
 export const PHOTO_MAX_SIDE = 1600
 export const PHOTO_JPEG_QUALITY = 0.85
@@ -55,13 +56,6 @@ export async function resizePhotoFile(file, maxSide = PHOTO_MAX_SIDE, quality = 
   } finally {
     if (bitmap.close) bitmap.close()
   }
-}
-
-export function qrSvg(text, cellSize = 4, margin = 2) {
-  const qr = qrcode(0, 'M')
-  qr.addData(text)
-  qr.make()
-  return qr.createSvgTag(cellSize, margin, text, text)
 }
 
 async function postWithRetry(url, payload) {
