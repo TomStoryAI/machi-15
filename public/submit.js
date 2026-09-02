@@ -129,10 +129,9 @@ export function initSubmitPage() {
       link.href = url
       link.textContent = url
       document.getElementById('mgmt-qr').innerHTML = qrSvg(url)
-      formSection.hidden = true
-      confirmation.hidden = false
 
-      // Photo upload (spec 004): post is created; attach the prepared photo with the management token.
+      // Photo upload (spec 004) BEFORE the confirmation shows, so leaving the page
+      // cannot abort the upload: post created -> photo attached -> then confirm.
       const warn = document.getElementById('photo-warn')
       if (photoToggle.checked && !photoBlob) {
         warn.textContent = 'Achtung: Das Foto wurde nicht übernommen. Wähle das Foto erneut aus und schicke das Inserat noch einmal ab.'
@@ -158,6 +157,8 @@ export function initSubmitPage() {
           warn.hidden = false
         }
       }
+      formSection.hidden = true
+      confirmation.hidden = false
     } else {
       const data = await res.json().catch(() => ({}))
       showError(data.error || 'Etwas ist schiefgelaufen. Bitte versuche es erneut.')
