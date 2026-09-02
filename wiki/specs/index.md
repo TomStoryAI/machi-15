@@ -6,14 +6,14 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 
 | # | Spec | Depends on |
 |---|---|---|
-| 004 | [Photo storage & serving](created/004-photo-storage.md) | 002 |
+| 004 | [Photo storage & serving](created/004-photo-storage.md) — **blocked: R2 not enabled on the account** | 002 |
 | 005 | [Admin API & page](created/005-admin.md) | 002 |
 | 006 | [Feed API](created/006-feed-api.md) | 002 |
 | 007 | [Display page](created/007-display-page.md) | 006 |
 | 008 | [Comments API & form](created/008-comments.md) | 006 |
 | 009 | [Comments on display](created/009-comments-display.md) | 007, 008 |
 | 010 | [Poster page](created/010-poster-page.md) | 002 |
-| 011 | [Expiry cron](created/011-expiry-cron.md) | 004 |
+| 011 | [Expiry cron](created/011-expiry-cron.md) — **blocked by 004** | 004 |
 | 012 | [Legal pages & board seed](created/012-legal-board-seed.md) | 001 |
 
 ## Completed
