@@ -7,7 +7,6 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 | # | Spec | Depends on |
 |---|---|---|
 | 004 | [Photo storage & serving](created/004-photo-storage.md) — **blocked: R2 not enabled on the account** | 002 |
-| 009 | [Comments on display](created/009-comments-display.md) | 007, 008 |
 | 010 | [Poster page](created/010-poster-page.md) | 002 |
 | 011 | [Expiry cron](created/011-expiry-cron.md) — **blocked by 004** | 004 |
 | 012 | [Legal pages & board seed](created/012-legal-board-seed.md) | 001 |
@@ -23,5 +22,6 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 | 006 | [Feed API](completed/006-feed-api.md) |
 | 007 | [Display page](completed/007-display-page.md) |
 | 008 | [Comments API & form](completed/008-comments.md) |
+| 009 | [Comments on display](completed/009-comments-display.md) |
 
 Overview contract: [wiki/architecture/mvp-spec.md](../architecture/mvp-spec.md)
