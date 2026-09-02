@@ -58,18 +58,25 @@ function renderPromoter(el, board) {
 export function initDisplayPage() {
   const boardId = boardIdFromPath(location.pathname)
   const frames = document.getElementById('frames')
+  const framesRight = document.getElementById('frames-right')
   const qrBox = document.getElementById('qr-box')
   const promoterTile = document.getElementById('promoter-tile')
   const offlineHint = document.getElementById('offline-hint')
-  if (!boardId || !frames || !qrBox) return
+  if (!boardId || !frames || !framesRight || !qrBox) return
 
   const feedUrl = `/api/boards/${boardId}/feed`
   const key = cacheKey(boardId)
 
   function render(data) {
-    frames.innerHTML = data.posts.length
-      ? data.posts.map((p) => frameHtml(p, boardId, location.origin)).join('')
-      : '<p class="empty">Noch keine Inserate.</p>'
+    // Two frame columns flank the center sponsor column (sample-board layout, 2026-09-02).
+    const half = Math.ceil(data.posts.length / 2)
+    const left = data.posts.slice(0, half)
+    const right = data.posts.slice(half)
+    frames.innerHTML = left.map((p) => frameHtml(p, boardId, location.origin)).join('')
+    framesRight.innerHTML = right.map((p) => frameHtml(p, boardId, location.origin)).join('')
+    if (data.posts.length === 0) {
+      frames.innerHTML = '<p class="empty">Noch keine Inserate.</p>'
+    }
     renderPromoter(promoterTile, data.board)
   }
 

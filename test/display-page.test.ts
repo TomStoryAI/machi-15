@@ -81,28 +81,33 @@ beforeEach(() => {
 })
 
 describe('display page', () => {
-  it('renders frames, QR tile and promoter tile from the feed', async () => {
+  it('renders frames in two columns, QR tile and the promoter tile in the middle', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(json(feedV1)))
     initDisplayPage()
 
     const frames = document.getElementById('frames')!
+    const framesRight = document.getElementById('frames-right')!
     await vi.waitFor(() => {
       expect(frames.textContent).toContain('Biete: Gassi gehen')
     })
-    expect(frames.textContent).toContain('Für Hunde in der Nachbarschaft.')
-    expect(frames.textContent).toContain('Tel.: 0151 123')
-    expect(frames.textContent).toContain('2 Kommentare')
-    expect(frames.textContent).toContain('Toller Post!')
-    expect(frames.textContent).toContain('Ja, gerne!')
-    expect(frames.textContent).toContain('Suche: Katze')
+    const allFramesText = frames.textContent + framesRight.textContent
+    expect(allFramesText).toContain('Für Hunde in der Nachbarschaft.')
+    expect(allFramesText).toContain('Tel.: 0151 123')
+    expect(allFramesText).toContain('2 Kommentare')
+    expect(allFramesText).toContain('Toller Post!')
+    expect(allFramesText).toContain('Ja, gerne!')
+    expect(allFramesText).toContain('Suche: Katze')
+    // two posts -> one per column
+    expect(frames.textContent).toContain('Biete: Gassi gehen')
+    expect(framesRight.textContent).toContain('Suche: Katze')
     // photo img only for the post with a photoKey
-    const imgs = frames.querySelectorAll('img')
+    const imgs = document.querySelectorAll('#frames img, #frames-right img')
     expect(imgs).toHaveLength(1)
     expect(imgs[0].getAttribute('src')).toBe('/api/photos/k2')
 
     // each frame carries a small QR to its comment form
-    expect(frames.innerHTML).toContain('/b/b1/p/p1')
-    expect(frames.innerHTML).toContain('/b/b1/p/p2')
+    expect(frames.innerHTML + framesRight.innerHTML).toContain('/b/b1/p/p1')
+    expect(frames.innerHTML + framesRight.innerHTML).toContain('/b/b1/p/p2')
 
     const qrBox = document.getElementById('qr-box')!
     expect(qrBox.innerHTML).toContain('<svg')
@@ -114,6 +119,17 @@ describe('display page', () => {
     expect(promoter.textContent).toContain('Mehr Naehe geht nicht.')
 
     expect(document.getElementById('offline-hint')!.hidden).toBe(true)
+  })
+
+  it('puts the promoter tile in the middle column between the frame columns', () => {
+    const children = Array.from(document.querySelector('.layout')!.children)
+    expect(children[0].id).toBe('frames')
+    expect(children[2].id).toBe('frames-right')
+    const middle = children[1] as HTMLElement
+    expect(middle.tagName).toBe('ASIDE')
+    expect(middle.classList.contains('side')).toBe(true)
+    expect(middle.querySelector('#promoter-tile')).not.toBeNull()
+    expect(middle.querySelector('#qr-tile')).not.toBeNull()
   })
 
   it('shows an empty state when no posts are live', async () => {
@@ -133,12 +149,13 @@ describe('display page', () => {
 
     await vi.advanceTimersByTimeAsync(0)
     const frames = document.getElementById('frames')!
+    const framesRight = document.getElementById('frames-right')!
     expect(frames.textContent).toContain('Biete: Gassi gehen')
-    expect(frames.textContent).not.toContain('Verkaufe: Fahrrad')
+    expect(frames.textContent + framesRight.textContent).not.toContain('Verkaufe: Fahrrad')
 
     await vi.advanceTimersByTimeAsync(25_000)
     expect(fetchMock).toHaveBeenCalledTimes(2)
-    expect(frames.textContent).toContain('Verkaufe: Fahrrad')
+    expect(frames.textContent + framesRight.textContent).toContain('Verkaufe: Fahrrad')
     vi.useRealTimers()
   })
 

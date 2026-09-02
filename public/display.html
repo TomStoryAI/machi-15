@@ -50,13 +50,13 @@
       }
       .layout {
         display: grid;
-        grid-template-columns: 1fr 22rem;
+        grid-template-columns: 1fr 24rem 1fr;
         gap: 1.5rem;
         align-items: start;
       }
       .frames {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+        display: flex;
+        flex-direction: column;
         gap: 1.25rem;
       }
       .frame {
@@ -127,6 +127,8 @@
         display: flex;
         flex-direction: column;
         gap: 1.25rem;
+        grid-column: 2;
+        grid-row: 1;
       }
       .qr-tile {
         background: var(--card);
@@ -146,11 +148,10 @@
         font-weight: 700;
       }
       .promoter-tile {
-        margin-top: auto;
         background: var(--card);
         border: 1px solid var(--line);
         border-radius: 0.9rem;
-        padding: 1.25rem;
+        padding: 1.5rem 1.25rem;
         text-align: center;
       }
       .promoter-logo {
@@ -186,12 +187,13 @@
     <main class="layout">
       <section id="frames" class="frames"></section>
       <aside class="side">
+        <div id="promoter-tile" class="promoter-tile"></div>
         <div id="qr-tile" class="qr-tile">
           <div id="qr-box"></div>
           <p class="qr-caption">Starte hier Dein kostenloses Inserat!</p>
         </div>
-        <div id="promoter-tile" class="promoter-tile"></div>
       </aside>
+      <section id="frames-right" class="frames"></section>
     </main>
     <footer class="legal">
       <a href="/impressum">Impressum</a> · <a href="/datenschutz">Datenschutz</a>

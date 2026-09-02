@@ -39,14 +39,17 @@ This page is the **overview contract**. Implementation proceeds as small numbere
 | Dev | `wrangler dev` (local Workers + D1 + R2 simulation), `wrangler deploy` |
 | Tests | Vitest (unit) + browser E2E through `wrangler dev` |
 
-## Display layout (per Tom's mockup, 2026-09-02)
+## Display layout (Tom's sample board, 2026-09-02)
 
 * Header: **"Machi-Board (Display)"** — exact wording to verify with Tom
-* Main area: grid of live frames — title, text/photo, contact details, comment count
+* **Sponsor tile in the MIDDLE of the board** (Tom's correction: the sponsor/promoter tile sits centered, not bottom-right). Implemented as a center column (promoter tile + big QR tile) flanked by frame columns left and right.
+* Main area: live frames — title, text/photo, contact details, comment count, small QR per frame
 * Big QR tile: "Starte hier Dein kostenloses Inserat!" → `/b/{boardId}/neu`
-* Bottom-right: **Promoter Frame** — sponsor logo, name, slogan (mockup: REWE / FAMILIE SCHULZE / "Mehr Nähe geht nicht."; slogan wording to verify)
+* **Tiles must match Tom's sample board EXACTLY** — open item: the sample screenshot (Desktop `Screenshot 2026-09-02 111217.png`) could not be rendered in the implementing session (no image support). Structure extracted programmatically (OCR + pixel analysis, see `scripts/analyze-*.mjs`): header strip, dense tile grid with a center sponsor tile ("REWE" at the image center), dense bottom strip. Tom must confirm the tile geometry (or describe it in text) — the current layout is interim.
+* Promoter data: REWE FAMILIE SCHULZE / "Mehr Nähe geht nicht." (slogan wording to verify)
 * Polls the feed every 20–30 s; works offline-ish (last feed cached, subtle offline hint)
 * 55" legibility: large type, high contrast, readable from a few meters
+* **MVP = a single market (one board)** — Tom's decision 2026-09-02; multi-board stays in the data model, out of MVP scope
 
 ## Pages
 
