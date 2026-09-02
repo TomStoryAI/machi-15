@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Inserat aufgeben — Machi-Board</title>
+    <style>
+      :root {
+        --bg: #f6f5f2;
+        --ink: #1c1b18;
+        --muted: #6b675f;
+        --accent: #0b6e4f;
+        --accent-ink: #ffffff;
+        --card: #ffffff;
+        --line: #dcd9d2;
+        --error: #b3261e;
+        --error-bg: #fdecea;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.5;
+      }
+      .page {
+        max-width: 32rem;
+        margin: 0 auto;
+        padding: 1.25rem 1.25rem 4rem;
+      }
+      header h1 {
+        margin: 0.5rem 0 0.25rem;
+        font-size: 1.75rem;
+      }
+      .subtitle {
+        margin: 0 0 1.5rem;
+        color: var(--muted);
+      }
+      form {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin: 1rem 0 0.25rem;
+      }
+      label:first-child {
+        margin-top: 0;
+      }
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      textarea,
+      select {
+        width: 100%;
+        font: inherit;
+        font-size: 1rem;
+        padding: 0.7rem 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 0.5rem;
+        background: #fff;
+        color: var(--ink);
+      }
+      textarea {
+        min-height: 7rem;
+        resize: vertical;
+      }
+      .hint {
+        margin: 0.25rem 0 0;
+        font-weight: 400;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .photo-toggle {
+        font-weight: 600;
+      }
+      .photo-toggle input {
+        margin-right: 0.4rem;
+      }
+      #photo-fields {
+        margin-top: 0.5rem;
+      }
+      #photo-preview {
+        display: block;
+        max-width: 100%;
+        max-height: 14rem;
+        margin-top: 0.5rem;
+        border-radius: 0.5rem;
+      }
+      fieldset {
+        border: 1px solid var(--line);
+        border-radius: 0.5rem;
+        margin: 1.25rem 0 0;
+        padding: 0.75rem 1rem 1rem;
+      }
+      legend {
+        font-weight: 600;
+        padding: 0 0.25rem;
+      }
+      fieldset label {
+        font-weight: 400;
+        margin-top: 0.75rem;
+      }
+      .duration {
+        display: flex;
+        gap: 1.5rem;
+      }
+      .duration label {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-weight: 400;
+      }
+      button[type="submit"] {
+        width: 100%;
+        margin-top: 1.5rem;
+        padding: 0.95rem;
+        font: inherit;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--accent-ink);
+        background: var(--accent);
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+      button[type="submit"]:disabled {
+        opacity: 0.6;
+      }
+      .error {
+        background: var(--error-bg);
+        color: var(--error);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        margin: 0 0 1rem;
+      }
+      #confirmation {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        padding: 1.5rem 1.25rem;
+        text-align: center;
+      }
+      #confirmation h2 {
+        margin-top: 0;
+        font-size: 1.4rem;
+      }
+      #mgmt-link {
+        display: inline-block;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        color: var(--accent);
+        font-weight: 600;
+      }
+      #mgmt-qr svg {
+        max-width: 13rem;
+        height: auto;
+        margin: 1rem 0 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Machi-Board</h1>
+        <p class="subtitle">Dein kostenloses Inserat für die Nachbarschaft.</p>
+      </header>
+
+      <section id="form-section">
+        <form id="submit-form">
+          <p id="error" class="error" role="alert" hidden></p>
+
+          <label for="category">Kategorie</label>
+          <select id="category" name="category" required>
+            <option value="" disabled selected>Bitte wählen</option>
+            <option value="Biete">Biete</option>
+            <option value="Suche">Suche</option>
+            <option value="Verkaufen">Verkaufen</option>
+            <option value="Veranstaltungen">Veranstaltungen</option>
+            <option value="Sonstiges">Sonstiges</option>
+          </select>
+
+          <label for="title">Titel</label>
+          <input id="title" name="title" type="text" maxlength="80" required placeholder="z. B. Biete: Gassi gehen" />
+
+          <label for="body">Text</label>
+          <textarea id="body" name="body" maxlength="500" required placeholder="Beschreibe Dein Anliegen in ein paar Sätzen …"></textarea>
+
+          <label class="photo-toggle" for="photo-toggle">
+            <input type="checkbox" id="photo-toggle" />
+            Foto hinzufügen
+          </label>
+          <div id="photo-fields" hidden>
+            <input type="file" id="photo-file" name="photo" accept="image/*" />
+            <p class="hint">Große Fotos werden automatisch verkleinert.</p>
+            <img id="photo-preview" alt="Foto-Vorschau" hidden />
+            <p id="photo-note" class="hint" hidden></p>
+          </div>
+
+          <fieldset>
+            <legend>Kontakt (optional)</legend>
+            <label for="contactPhone">Telefon</label>
+            <input id="contactPhone" name="contactPhone" type="tel" maxlength="200" autocomplete="tel" />
+            <label for="contactWhatsapp">WhatsApp</label>
+            <input id="contactWhatsapp" name="contactWhatsapp" type="tel" maxlength="200" />
+            <label for="contactEmail">E-Mail</label>
+            <input id="contactEmail" name="contactEmail" type="email" maxlength="200" autocomplete="email" />
+            <label for="contactInstagram">Instagram</label>
+            <input id="contactInstagram" name="contactInstagram" type="text" maxlength="200" />
+            <label for="contactAddress">Adresse</label>
+            <input id="contactAddress" name="contactAddress" type="text" maxlength="200" />
+          </fieldset>
+
+          <fieldset>
+            <legend>Laufzeit</legend>
+            <div class="duration">
+              <label><input type="radio" name="durationWeeks" value="1" /> 1 Woche</label>
+              <label><input type="radio" name="durationWeeks" value="2" checked /> 2 Wochen</label>
+            </div>
+          </fieldset>
+
+          <button type="submit" id="submit-btn">Inserat abschicken</button>
+        </form>
+      </section>
+
+      <section id="confirmation" hidden>
+        <h2>Vielen Dank! Dein Inserat wird geprüft.</h2>
+        <p>Sobald es freigeschaltet ist, erscheint es auf dem Machi-Board.</p>
+        <p>Speichere diesen Link, um Dein Inserat zu verwalten:</p>
+        <p><a id="mgmt-link" href=""></a></p>
+        <div id="mgmt-qr"></div>
+        <p class="hint">Tipp: Mache einen Screenshot von Link oder QR-Code, um Dein Inserat später zu verwalten.</p>
+      </section>
+    </main>
+    <script type="module">
+      import { initSubmitPage } from '/submit.js'
+      initSubmitPage()
+    </script>
+  </body>
+</html>
