@@ -34,6 +34,14 @@ app.get('/p/:postId', async (c) => {
   return c.env.ASSETS.fetch(new Request(new URL('/poster.html', c.req.url)))
 })
 
+// Legal pages (spec 012).
+app.get('/impressum', async (c) => {
+  return c.env.ASSETS.fetch(new Request(new URL('/impressum.html', c.req.url)))
+})
+app.get('/datenschutz', async (c) => {
+  return c.env.ASSETS.fetch(new Request(new URL('/datenschutz.html', c.req.url)))
+})
+
 // Admin page, same pattern.
 app.get('/admin/:boardId', async (c) => {
   return c.env.ASSETS.fetch(new Request(new URL('/admin.html', c.req.url)))

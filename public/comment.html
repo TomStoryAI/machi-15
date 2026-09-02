@@ -106,6 +106,15 @@
         margin-top: 0;
         font-size: 1.3rem;
       }
+      .legal {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .legal a {
+        color: var(--muted);
+      }
     </style>
   </head>
   <body>
@@ -131,6 +140,9 @@
         <h2>Vielen Dank! Dein Kommentar wird geprüft.</h2>
         <p>Sobald er freigeschaltet ist, erscheint er auf dem Machi-Board.</p>
       </section>
+      <footer class="legal">
+        <a href="/impressum">Impressum</a> · <a href="/datenschutz">Datenschutz</a>
+      </footer>
     </main>
     <script type="module">
       import { initCommentPage } from '/comment.js'

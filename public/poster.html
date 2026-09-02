@@ -95,6 +95,15 @@
         padding: 0.75rem;
         margin: 0 0 1rem;
       }
+      .legal {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .legal a {
+        color: var(--muted);
+      }
     </style>
   </head>
   <body>
@@ -115,6 +124,9 @@
       </section>
 
       <button type="button" id="delete-btn" class="danger-btn" hidden>Inserat löschen</button>
+      <footer class="legal">
+        <a href="/impressum">Impressum</a> · <a href="/datenschutz">Datenschutz</a>
+      </footer>
     </main>
     <script type="module">
       import { initPosterPage } from '/poster.js'

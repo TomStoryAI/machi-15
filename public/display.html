@@ -168,6 +168,14 @@
         font-size: 1rem;
         color: var(--muted);
       }
+      .legal {
+        margin-top: 1.5rem;
+        font-size: 0.7rem;
+        color: var(--muted);
+      }
+      .legal a {
+        color: var(--muted);
+      }
     </style>
   </head>
   <body>
@@ -185,6 +193,9 @@
         <div id="promoter-tile" class="promoter-tile"></div>
       </aside>
     </main>
+    <footer class="legal">
+      <a href="/impressum">Impressum</a> · <a href="/datenschutz">Datenschutz</a>
+    </footer>
     <script type="module">
       import { initDisplayPage } from '/display.js'
       initDisplayPage()

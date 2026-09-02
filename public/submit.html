@@ -163,6 +163,15 @@
         height: auto;
         margin: 1rem 0 0;
       }
+      .legal {
+        margin-top: 2rem;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .legal a {
+        color: var(--muted);
+      }
     </style>
   </head>
   <body>
@@ -237,6 +246,9 @@
         <div id="mgmt-qr"></div>
         <p class="hint">Tipp: Mache einen Screenshot von Link oder QR-Code, um Dein Inserat später zu verwalten.</p>
       </section>
+      <footer class="legal">
+        <a href="/impressum">Impressum</a> · <a href="/datenschutz">Datenschutz</a>
+      </footer>
     </main>
     <script type="module">
       import { initSubmitPage } from '/submit.js'
