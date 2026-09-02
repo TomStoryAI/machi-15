@@ -2,7 +2,14 @@
 // enough SQL semantics (dispatch on query keywords) to let route tests run end-to-end
 // against the real Hono app: login -> session -> pending -> approve/reject/delete.
 
-export type FakeBoard = { id: string; admin_password_hash: string }
+export type FakeBoard = {
+  id: string
+  name: string
+  admin_password_hash: string
+  promoter_name?: string | null
+  promoter_logo_key?: string | null
+  promoter_slogan?: string | null
+}
 export type FakePost = {
   id: string
   board_id: string
@@ -18,6 +25,7 @@ export type FakePost = {
   duration_weeks: number
   status: 'pending' | 'live' | 'rejected'
   expires_at: string | null
+  approved_at: string | null
   created_at: string
 }
 export type FakeComment = { id: string; post_id: string; body: string; status: 'pending' | 'live' | 'rejected'; created_at: string }
@@ -76,13 +84,20 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
       const status = query.includes("status = 'live'") ? 'live' : 'pending'
       return posts
         .filter((p) => p.board_id === bound[0] && p.status === status)
-        .sort((a, b) => a.created_at.localeCompare(b.created_at))
+        .sort((a, b) =>
+          status === 'live'
+            ? (b.approved_at ?? '').localeCompare(a.approved_at ?? '')
+            : a.created_at.localeCompare(b.created_at),
+        )
     }
     if (query.includes('FROM comments')) {
+      const liveComments = query.includes("c.status = 'live'")
       return comments
         .filter((c) => {
           const post = posts.find((p) => p.id === c.post_id)
-          return post?.board_id === bound[0] && c.status === 'pending'
+          if (!post || post.board_id !== bound[0]) return false
+          if (liveComments) return c.status === 'live' && post.status === 'live'
+          return c.status === 'pending'
         })
         .map((c) => ({ ...c, post_title: posts.find((p) => p.id === c.post_id)?.title ?? '' }))
     }

@@ -20,6 +20,7 @@ const pendingPost: FakePost = {
   duration_weeks: 1,
   status: 'pending',
   expires_at: null,
+  approved_at: null,
   created_at: '2026-09-02 10:00:00',
 }
 
@@ -33,7 +34,7 @@ const pendingComment: FakeComment = {
 
 beforeAll(async () => {
   db = adminDb({
-    board: { id: 'b1', admin_password_hash: await hashAdminPassword('geheim', { iterations: 1000 }) },
+    board: { id: 'b1', name: 'Test-Board', admin_password_hash: await hashAdminPassword('geheim', { iterations: 1000 }) },
     posts: [pendingPost],
     comments: [pendingComment],
   })
