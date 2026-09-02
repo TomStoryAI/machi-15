@@ -95,6 +95,10 @@ describe('display page', () => {
     expect(imgs).toHaveLength(1)
     expect(imgs[0].getAttribute('src')).toBe('/api/photos/k2')
 
+    // each frame carries a small QR to its comment form
+    expect(frames.innerHTML).toContain('/b/b1/p/p1')
+    expect(frames.innerHTML).toContain('/b/b1/p/p2')
+
     const qrBox = document.getElementById('qr-box')!
     expect(qrBox.innerHTML).toContain('<svg')
     expect(qrBox.innerHTML).toContain('/b/b1/neu')

@@ -15,3 +15,16 @@ export function contactsLine(post) {
   const parts = CONTACT_LABELS.filter(([key]) => post[key]).map(([key, label]) => `${label}: ${esc(post[key])}`)
   return parts.length ? `<p class="contacts">${parts.join(' · ')}</p>` : ''
 }
+
+// One automatic retry on network failure; resolves null when the network stays down.
+export async function postWithRetry(url, options) {
+  try {
+    return await fetch(url, options)
+  } catch {
+    try {
+      return await fetch(url, options)
+    } catch {
+      return null
+    }
+  }
+}

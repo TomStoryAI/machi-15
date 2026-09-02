@@ -19,7 +19,11 @@ export function submitQrUrl(origin, boardId) {
   return `${origin}/b/${boardId}/neu`
 }
 
-export function frameHtml(post) {
+export function commentUrl(origin, boardId, postId) {
+  return `${origin}/b/${boardId}/p/${postId}`
+}
+
+export function frameHtml(post, boardId, origin) {
   const count = post.comments.length
   const commentsBadge = count === 0 ? '' : `<span class="frame-comments">${count === 1 ? '1 Kommentar' : `${count} Kommentare`}</span>`
   return `
@@ -29,6 +33,7 @@ export function frameHtml(post) {
       <p class="frame-body">${esc(post.body)}</p>
       ${contactsLine(post)}
       ${commentsBadge}
+      <div class="frame-qr">${qrSvg(commentUrl(origin, boardId, post.id), 3, 1)}</div>
     </article>`
 }
 
@@ -57,7 +62,7 @@ export function initDisplayPage() {
 
   function render(data) {
     frames.innerHTML = data.posts.length
-      ? data.posts.map(frameHtml).join('')
+      ? data.posts.map((p) => frameHtml(p, boardId, location.origin)).join('')
       : '<p class="empty">Noch keine Inserate.</p>'
     renderPromoter(promoterTile, data.board)
   }

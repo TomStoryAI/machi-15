@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kommentieren — Machi-Board</title>
+    <style>
+      :root {
+        --bg: #f6f5f2;
+        --ink: #1c1b18;
+        --muted: #6b675f;
+        --accent: #0b6e4f;
+        --accent-ink: #ffffff;
+        --card: #ffffff;
+        --line: #dcd9d2;
+        --error: #b3261e;
+        --error-bg: #fdecea;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.5;
+      }
+      .page {
+        max-width: 32rem;
+        margin: 0 auto;
+        padding: 1.25rem 1.25rem 4rem;
+      }
+      header h1 {
+        margin: 0.5rem 0 1.25rem;
+        font-size: 1.5rem;
+      }
+      .post-box {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        padding: 1.1rem 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .post-box h2 {
+        margin: 0 0 0.35rem;
+        font-size: 1.15rem;
+      }
+      .post-box p {
+        margin: 0;
+        color: var(--muted);
+      }
+      form {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        padding: 1.25rem;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        margin: 0 0 0.25rem;
+      }
+      textarea {
+        width: 100%;
+        font: inherit;
+        font-size: 1rem;
+        padding: 0.7rem 0.75rem;
+        border: 1px solid var(--line);
+        border-radius: 0.5rem;
+        min-height: 6rem;
+        resize: vertical;
+      }
+      button[type="submit"] {
+        width: 100%;
+        margin-top: 1rem;
+        padding: 0.95rem;
+        font: inherit;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--accent-ink);
+        background: var(--accent);
+        border: none;
+        border-radius: 0.5rem;
+        cursor: pointer;
+      }
+      .error {
+        background: var(--error-bg);
+        color: var(--error);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        margin: 0 0 1rem;
+      }
+      .hint {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      #confirmation {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        padding: 1.5rem 1.25rem;
+        text-align: center;
+      }
+      #confirmation h2 {
+        margin-top: 0;
+        font-size: 1.3rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Kommentar schreiben</h1>
+      </header>
+
+      <p id="error" class="error" role="alert" hidden></p>
+
+      <section id="post-box" class="post-box" hidden></section>
+
+      <section id="form-section">
+        <form id="comment-form">
+          <label for="comment-body">Dein Kommentar</label>
+          <textarea id="comment-body" name="body" maxlength="500" required placeholder="Schreib etwas Nettes …"></textarea>
+          <p class="hint">Kommentare werden vor der Veröffentlichung geprüft.</p>
+          <button type="submit">Abschicken</button>
+        </form>
+      </section>
+
+      <section id="confirmation" hidden>
+        <h2>Vielen Dank! Dein Kommentar wird geprüft.</h2>
+        <p>Sobald er freigeschaltet ist, erscheint er auf dem Machi-Board.</p>
+      </section>
+    </main>
+    <script type="module">
+      import { initCommentPage } from '/comment.js'
+      initCommentPage()
+    </script>
+  </body>
+</html>

@@ -1,6 +1,7 @@
 // Submit page logic — vanilla ES module, no build step.
 // Pure helpers are exported so Vitest can exercise them directly.
 import { qrSvg } from './qr.js'
+import { postWithRetry } from './ui.js'
 export { qrSvg }
 
 export const PHOTO_MAX_SIDE = 1600
@@ -58,23 +59,6 @@ export async function resizePhotoFile(file, maxSide = PHOTO_MAX_SIDE, quality = 
   }
 }
 
-async function postWithRetry(url, payload) {
-  const options = {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify(payload),
-  }
-  try {
-    return await fetch(url, options)
-  } catch {
-    try {
-      return await fetch(url, options)
-    } catch {
-      return null
-    }
-  }
-}
-
 export function initSubmitPage() {
   const boardId = boardIdFromPath(location.pathname)
   const form = document.getElementById('submit-form')
@@ -126,7 +110,11 @@ export function initSubmitPage() {
     errorBox.hidden = true
     const fd = new FormData(form)
     const payload = buildPayload(boardId, Object.fromEntries(fd.entries()))
-    const res = await postWithRetry('/api/posts', payload)
+    const res = await postWithRetry('/api/posts', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
     if (!res) {
       showError('Netzwerkfehler. Bitte prüfe Deine Verbindung und versuche es erneut.')
       return

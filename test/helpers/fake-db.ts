@@ -31,11 +31,12 @@ export type FakePost = {
 export type FakeComment = { id: string; post_id: string; body: string; status: 'pending' | 'live' | 'rejected'; created_at: string }
 export type FakeSession = { token_hash: string; board_id: string; expires_at: string }
 
-export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?: FakeComment[] }) {
+export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?: FakeComment[]; recentComments?: number }) {
   const boards = [seed.board]
   const posts: FakePost[] = seed.posts ?? []
   const comments: FakeComment[] = seed.comments ?? []
   const sessions: FakeSession[] = []
+  let recentComments = seed.recentComments ?? 0
 
   type Stmt = {
     bind: (...args: unknown[]) => Stmt
@@ -76,6 +77,13 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
       const post = posts.find((p) => p.id === bound[0] && p.board_id === bound[1])
       return post ? { duration_weeks: post.duration_weeks } : null
     }
+    if (query.includes('FROM posts') && query.includes('expires_at') && query.includes('status')) {
+      const post = posts.find((p) => p.id === bound[0])
+      return post ? { id: post.id, status: post.status, expires_at: post.expires_at } : null
+    }
+    if (query.includes('COUNT') && query.includes('FROM comments')) {
+      return { n: recentComments }
+    }
     return null
   }
 
@@ -105,6 +113,16 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
   }
 
   function runMutation(query: string): number {
+    if (query.startsWith('INSERT INTO comments')) {
+      comments.push({
+        id: bound[0] as string,
+        post_id: bound[1] as string,
+        body: bound[2] as string,
+        status: 'pending',
+        created_at: '2026-09-02 12:00:00',
+      })
+      return 1
+    }
     if (query.startsWith('INSERT INTO admin_sessions')) {
       sessions.push({ token_hash: bound[0] as string, board_id: bound[1] as string, expires_at: bound[2] as string })
       return 1
@@ -150,7 +168,17 @@ export function adminDb(seed: { board: FakeBoard; posts?: FakePost[]; comments?:
       return stmt
     },
     // introspect state in tests
-    _state: () => ({ posts: posts.map((p) => ({ ...p })), comments: [...comments], sessions: [...sessions] }),
+    _state: () => ({
+      posts: posts.map((p) => ({ ...p })),
+      comments: [...comments],
+      sessions: [...sessions],
+      get recentComments() {
+        return recentComments
+      },
+      set recentComments(n: number) {
+        recentComments = n
+      },
+    }),
   }
   return db
 }

@@ -31,11 +31,15 @@ const basePost = {
 
 describe('frameHtml', () => {
   it('renders title, body, contacts and comment count', () => {
-    const html = frameHtml({
-      ...basePost,
-      contactPhone: '0151 123',
-      comments: [{ id: 'c1' }, { id: 'c2' }],
-    })
+    const html = frameHtml(
+      {
+        ...basePost,
+        contactPhone: '0151 123',
+        comments: [{ id: 'c1' }, { id: 'c2' }],
+      },
+      'b1',
+      'https://machi15.com',
+    )
     expect(html).toContain('Biete: Gassi gehen')
     expect(html).toContain('Für Hunde in der Nachbarschaft.')
     expect(html).toContain('Tel.: 0151 123')
@@ -43,21 +47,28 @@ describe('frameHtml', () => {
   })
 
   it('uses the singular for one comment and hides the badge for none', () => {
-    expect(frameHtml({ ...basePost, comments: [{ id: 'c1' }] })).toContain('1 Kommentar')
-    expect(frameHtml(basePost)).not.toContain('Kommentar')
+    expect(frameHtml({ ...basePost, comments: [{ id: 'c1' }] }, 'b1', 'https://machi15.com')).toContain('1 Kommentar')
+    expect(frameHtml(basePost, 'b1', 'https://machi15.com')).not.toContain('Kommentar')
   })
 
   it('escapes user text', () => {
-    const html = frameHtml({ ...basePost, title: '<script>alert(1)</script>' })
+    const html = frameHtml({ ...basePost, title: '<script>alert(1)</script>' }, 'b1', 'https://machi15.com')
     expect(html).not.toContain('<script>')
     expect(html).toContain('&lt;script&gt;')
   })
 
   it('renders a photo only when a photoKey is present', () => {
-    expect(frameHtml(basePost)).not.toContain('<img')
-    const withPhoto = frameHtml({ ...basePost, photoKey: 'k2' })
+    expect(frameHtml(basePost, 'b1', 'https://machi15.com')).not.toContain('<img')
+    const withPhoto = frameHtml({ ...basePost, photoKey: 'k2' }, 'b1', 'https://machi15.com')
     expect(withPhoto).toContain('<img')
     expect(withPhoto).toContain('/api/photos/k2')
+  })
+
+  it('renders a small QR linking to the comment form of the frame', () => {
+    const html = frameHtml(basePost, 'b1', 'https://machi15.com')
+    expect(html).toContain('<svg')
+    expect(html).toContain('/b/b1/p/p1')
+    expect(html).toContain('frame-qr')
   })
 })
 
