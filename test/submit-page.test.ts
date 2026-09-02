@@ -185,6 +185,20 @@ describe('submit page form', () => {
     expect(uploaded.size).toBeGreaterThan(0)
   })
 
+  it('warns in the confirmation when a toggled photo never got prepared', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockImplementation(() => Promise.resolve(jsonResponse(201, { postId: 'p1', mgmtToken: 'tok' }))))
+    const toggle = document.getElementById('photo-toggle') as HTMLInputElement
+    toggle.checked = true
+    fillForm()
+
+    const confirmation = document.getElementById('confirmation')!
+    await vi.waitFor(() => {
+      expect(confirmation.hidden).toBe(false)
+    })
+    expect(document.getElementById('photo-warn')!.hidden).toBe(false)
+    expect(document.getElementById('photo-warn')!.textContent).toContain('Foto wurde nicht übernommen')
+  })
+
   it('still confirms the post but notes when the photo upload fails', async () => {
     vi.stubGlobal('createImageBitmap', vi.fn().mockResolvedValue({ width: 800, height: 600, close: vi.fn() }))
     HTMLCanvasElement.prototype.getContext = function () {

@@ -133,7 +133,11 @@ export function initSubmitPage() {
       confirmation.hidden = false
 
       // Photo upload (spec 004): post is created; attach the prepared photo with the management token.
-      if (photoBlob) {
+      const warn = document.getElementById('photo-warn')
+      if (photoToggle.checked && !photoBlob) {
+        warn.textContent = 'Achtung: Das Foto wurde nicht übernommen. Wähle das Foto erneut aus und schicke das Inserat noch einmal ab.'
+        warn.hidden = false
+      } else if (photoBlob) {
         const fd = new FormData()
         fd.set('photo', photoBlob, photoBlob.name || 'foto.jpg')
         const upload = await postWithRetry(`/api/posts/${data.postId}/photo?t=${encodeURIComponent(data.mgmtToken)}`, {
@@ -141,8 +145,16 @@ export function initSubmitPage() {
           body: fd,
         })
         if (!upload || !upload.ok) {
-          const warn = document.getElementById('photo-warn')
-          warn.textContent = 'Das Foto konnte nicht hochgeladen werden. Dein Inserat ist trotzdem eingereicht.'
+          let detail = ''
+          if (upload) {
+            try {
+              const err = await upload.json()
+              detail = ` (${err.error ?? ''})`
+            } catch {
+              /* non-JSON error */
+            }
+          }
+          warn.textContent = `Das Foto konnte nicht hochgeladen werden${detail}. Dein Inserat ist trotzdem eingereicht.`
           warn.hidden = false
         }
       }

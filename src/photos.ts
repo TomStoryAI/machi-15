@@ -70,8 +70,12 @@ photosRoutes.post('/api/posts/:id/photo', async (c) => {
   const post = await findPostByToken(db, postId, token)
   if (!post) return c.json({ error: 'Inserat nicht gefunden.' }, 404)
 
-  const form = await c.req.formData().catch(() => null)
+  const form = await c.req.formData().catch((e) => {
+    console.log(`photo upload: multipart parse failed for ${postId}: ${e}`)
+    return null
+  })
   const file = form?.get('photo')
+  console.log(`photo upload attempt: post=${postId} type=${file && typeof file === 'object' && 'type' in file ? (file as File).type : typeof file} size=${file && typeof file === 'object' && 'size' in file ? (file as File).size : 'n/a'}`)
   if (!(file instanceof File)) return c.json({ error: 'Bitte wähle ein Bild aus.' }, 400)
   if (!file.type.startsWith('image/')) return c.json({ error: 'Bitte lade ein Bild hoch (JPG oder PNG).' }, 400)
   if (file.size > PHOTO_MAX_BYTES) return c.json({ error: 'Das Bild ist zu groß (max. 4 MB).' }, 400)
