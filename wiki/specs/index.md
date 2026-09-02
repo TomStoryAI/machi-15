@@ -1,0 +1,26 @@
+# Specs
+
+Build in **number order**. **State = folder**: a spec lives in `created/` until it is implemented AND verified, then its file moves to `completed/` and a `wiki/log.md` entry is added.
+
+## Created (build queue)
+
+| # | Spec | Depends on |
+|---|---|---|
+| 001 | [Repo bootstrap & deploy](created/001-repo-bootstrap.md) | — |
+| 002 | [Submit API](created/002-submit-api.md) | 001 |
+| 003 | [Submit page](created/003-submit-page.md) | 002 |
+| 004 | [Photo storage & serving](created/004-photo-storage.md) | 002 |
+| 005 | [Admin API & page](created/005-admin.md) | 002 |
+| 006 | [Feed API](created/006-feed-api.md) | 002 |
+| 007 | [Display page](created/007-display-page.md) | 006 |
+| 008 | [Comments API & form](created/008-comments.md) | 006 |
+| 009 | [Comments on display](created/009-comments-display.md) | 007, 008 |
+| 010 | [Poster page](created/010-poster-page.md) | 002 |
+| 011 | [Expiry cron](created/011-expiry-cron.md) | 004 |
+| 012 | [Legal pages & board seed](created/012-legal-board-seed.md) | 001 |
+
+## Completed
+
+(none yet)
+
+Overview contract: [wiki/architecture/mvp-spec.md](../architecture/mvp-spec.md)

@@ -32,6 +32,8 @@ Digital "schwarzes Brett" (bulletin board) for public 55" Google-TV displays. Pa
 
 **The wiki is the source of truth and grows organically.** If Tom adds or edits a page under `wiki/`, read it and drive implementation from it before writing code.
 
+**Spec workflow**: implementation proceeds as small numbered specs (001, 002, …). **State = folder**: work in number order, pick the next spec from `wiki/specs/created/`, implement it, verify it, then move its file to `wiki/specs/completed/` and add a `wiki/log.md` entry. `wiki/architecture/mvp-spec.md` is the overview contract that the numbered specs slice up.
+
 ## Status
 
-Design in progress (brainstorming). No code yet. Next: design part 2 (submit flow, admin flow, error handling, testing) → written spec in wiki/architecture/ → implementation plan. Open questions: wiki/architecture/open-questions.md
+Design complete, awaiting Tom's review of wiki/architecture/mvp-spec.md and wiki/specs/. No code yet. Implementation starts at spec 001 (wiki/specs/001-repo-bootstrap.md). Open questions: wiki/architecture/open-questions.md

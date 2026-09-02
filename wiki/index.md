@@ -11,11 +11,16 @@ okf_version: 0.1
 
 ## Architecture
 
+* [MVP spec](architecture/mvp-spec.md) — the overview contract (scope, stack, layout, flows, API, errors, testing)
 * [Constraints](architecture/constraints.md) — hard constraints every design must respect
 * [Deployment](architecture/deployment.md) — Cloudflare free-tier stack decision + zero-cost math
 * [Components](architecture/components.md) — frontends, Worker API, storage, expiry job
 * [Data model](architecture/data-model.md) — D1 tables: boards, posts, comments
 * [Open questions](architecture/open-questions.md) — pending decisions that block design part 2
+
+## Specs
+
+* [Specs roadmap](specs/index.md) — numbered small specs 001–012 (created → completed), the build queue
 
 ## References
 

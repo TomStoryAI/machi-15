@@ -2,6 +2,13 @@
 
 ## 2026-09-02
 
+* **Update** — Specs reorganized into `created/` and `completed/` folders — the folder is the state (replaces the frontmatter status field)
+* **Decision** — Spec workflow: small numbered specs in wiki/specs/ (001–012), status `created` → `completed`, built in number order
+* **Creation** — wiki/specs/ created: 12 numbered specs + roadmap index (001 bootstrap → 012 legal/seed)
+* **Creation** — MVP spec written to wiki/architecture/mvp-spec.md (the overview contract)
+* **Update** — Display layout from Tom's mockup screenshot: header "Machi-Board (Display)", promoter tile bottom-right (mockup: REWE / FAMILIE SCHULZE / "Mehr Nähe geht nicht.")
+* **Update** — boards table gains promoter fields: promoter_name, promoter_logo_key, promoter_slogan
+* **Decision** — Tech stack: vanilla HTML/CSS/JS frontend; Workers + TypeScript + Hono; D1; R2; QR = plain URLs
 * **Creation** — OKF knowledge base initialized under `wiki/` (business/, architecture/, references/)
 * **Creation** — Repo cloned to E:\Programmieren\machi-15 (repo was empty)
 * **Decision** — Deployment: Cloudflare Pages + Workers + D1 + R2, free tier (see architecture/deployment.md)

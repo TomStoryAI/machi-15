@@ -9,7 +9,7 @@ status: draft
 
 ## boards
 
-`id`, `name`, `location`, `admin_password_hash`, `created_at`
+`id`, `name`, `location`, `admin_password_hash`, `promoter_name?`, `promoter_logo_key?`, `promoter_slogan?`, `created_at`
 
 ## posts
 
@@ -30,6 +30,7 @@ status: draft
 
 * Multi-board via `board_id` from day 1; MVP runs a single board.
 * Contact fields map 1:1 to the Miro examples (phone, WhatsApp, email, Instagram, address).
+* Promoter fields render the sponsor tile on the display (from Tom's mockup: logo, name, slogan — e.g. REWE / FAMILIE SCHULZE / "Mehr Nähe geht nicht.").
 
 ## Related
 
