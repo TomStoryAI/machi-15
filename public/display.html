@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Machi-Board (Display)</title>
     <style>
-      /* 55" TV display: large type, high contrast, readable from a few meters. */
+      /* 55" TV display per Tom's sample board (spec 013): 3 rows x 9 columns of tiles.
+         Empty tiles are QR codes, taken tiles show posts, the sponsor banner sits
+         in the middle of the middle row. Large type, high contrast. */
       :root {
         --bg: #ffffff;
         --ink: #111111;
@@ -18,26 +20,28 @@
         box-sizing: border-box;
       }
       html {
-        font-size: 24px;
+        font-size: 20px;
       }
       body {
         margin: 0;
-        padding: 1.5rem 2rem;
+        padding: 1.25rem 1.5rem;
         background: var(--bg);
         color: var(--ink);
         font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
         line-height: 1.4;
         min-height: 100vh;
+        display: flex;
+        flex-direction: column;
       }
       header {
         display: flex;
         align-items: baseline;
         justify-content: space-between;
-        margin-bottom: 1.25rem;
+        margin-bottom: 1rem;
       }
       header h1 {
         margin: 0;
-        font-size: 2.4rem;
+        font-size: 2.2rem;
         letter-spacing: 0.01em;
       }
       .offline {
@@ -48,129 +52,113 @@
         border-radius: 999px;
         padding: 0.3rem 1rem;
       }
-      .layout {
+      #grid {
+        flex: 1;
         display: grid;
-        grid-template-columns: 1fr 24rem 1fr;
-        gap: 1.5rem;
-        align-items: start;
+        grid-template-columns: repeat(9, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 0.9rem;
+        min-height: 0;
       }
-      .frames {
+      .tile,
+      .frame,
+      .sponsor {
+        border: 1px solid var(--line);
+        border-radius: 0.75rem;
+        background: var(--card);
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+      }
+      .tile {
         display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem;
+      }
+      .tile-qr svg {
+        width: 100%;
+        max-width: 11rem;
+        height: auto;
       }
       .frame {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 0.9rem;
-        padding: 1.1rem 1.25rem;
         display: flex;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 0.35rem;
+        padding: 0.8rem 0.9rem;
       }
       .frame-title {
         margin: 0;
-        font-size: 1.35rem;
+        font-size: 1.15rem;
         font-weight: 700;
+        overflow-wrap: anywhere;
       }
       .frame-body {
         margin: 0;
-        font-size: 1.05rem;
+        font-size: 0.95rem;
         overflow-wrap: anywhere;
+        flex: 1;
       }
       .frame-photo {
         width: 100%;
-        max-height: 14rem;
+        max-height: 9rem;
         object-fit: cover;
-        border-radius: 0.6rem;
+        border-radius: 0.5rem;
       }
       .contacts {
         margin: 0;
-        font-size: 0.95rem;
+        font-size: 0.85rem;
         color: var(--muted);
       }
       .frame-comments {
         align-self: flex-start;
-        font-size: 0.85rem;
+        font-size: 0.75rem;
         font-weight: 600;
         background: #e7efe9;
         color: var(--accent);
         border-radius: 999px;
-        padding: 0.15rem 0.8rem;
-        margin-top: auto;
+        padding: 0.1rem 0.6rem;
       }
       .frame-comment-list {
-        margin: 0.25rem 0 0;
+        margin: 0;
         padding: 0 0 0 1rem;
         list-style: disc;
       }
       .frame-comment-list li {
-        font-size: 0.9rem;
+        font-size: 0.8rem;
         color: var(--muted);
-        margin: 0.2rem 0;
+        margin: 0.15rem 0;
         overflow-wrap: anywhere;
       }
-      .frame-qr {
-        margin-top: 0.5rem;
-      }
       .frame-qr svg {
-        width: 4.5rem;
+        width: 3.2rem;
         height: auto;
         display: block;
       }
-      .empty {
-        color: var(--muted);
-        font-style: italic;
-        font-size: 1.2rem;
-      }
-      .side {
+      .sponsor {
         display: flex;
         flex-direction: column;
-        gap: 1.25rem;
-        grid-column: 2;
-        grid-row: 1;
-      }
-      .qr-tile {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 0.9rem;
-        padding: 1.25rem;
-        text-align: center;
-      }
-      #qr-box svg {
-        width: 100%;
-        max-width: 16rem;
-        height: auto;
-      }
-      .qr-caption {
-        margin: 0.75rem 0 0;
-        font-size: 1.15rem;
-        font-weight: 700;
-      }
-      .promoter-tile {
-        background: var(--card);
-        border: 1px solid var(--line);
-        border-radius: 0.9rem;
-        padding: 1.5rem 1.25rem;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        padding: 0.9rem;
         text-align: center;
       }
       .promoter-logo {
-        max-width: 10rem;
-        max-height: 6rem;
-        margin-bottom: 0.5rem;
+        max-width: 100%;
+        max-height: 65%;
+        object-fit: contain;
       }
       .promoter-name {
-        display: block;
-        font-size: 1.3rem;
+        font-size: 1.1rem;
         font-weight: 700;
       }
       .promoter-slogan {
-        display: block;
-        font-size: 1rem;
+        font-size: 0.9rem;
         color: var(--muted);
       }
       .legal {
-        margin-top: 1.5rem;
+        margin-top: 1rem;
         font-size: 0.7rem;
         color: var(--muted);
       }
@@ -184,17 +172,7 @@
       <h1>Machi-Board (Display)</h1>
       <p id="offline-hint" class="offline" hidden>Offline – zeige den letzten Stand.</p>
     </header>
-    <main class="layout">
-      <section id="frames" class="frames"></section>
-      <aside class="side">
-        <div id="promoter-tile" class="promoter-tile"></div>
-        <div id="qr-tile" class="qr-tile">
-          <div id="qr-box"></div>
-          <p class="qr-caption">Starte hier Dein kostenloses Inserat!</p>
-        </div>
-      </aside>
-      <section id="frames-right" class="frames"></section>
-    </main>
+    <main id="grid"></main>
     <footer class="legal">
       <a href="/impressum">Impressum</a> · <a href="/datenschutz">Datenschutz</a>
     </footer>

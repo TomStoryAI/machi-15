@@ -1,10 +1,16 @@
 // TV display page logic — vanilla ES module, no build step.
+// Board layout per Tom's sample board (spec 013): 3 rows x 9 columns of tiles.
+// Empty tiles are QR codes (scan -> post there); taken tiles show the post;
+// the sponsor banner sits in the middle of the middle row.
 // Polls the feed every POLL_MS, caches the last good feed in localStorage,
 // and shows a subtle offline hint instead of a blank screen.
 import { qrSvg } from './qr.js'
 import { contactsLine, esc } from './ui.js'
 
 export const POLL_MS = 25_000
+export const GRID_COLS = 9
+export const GRID_ROWS = 3
+export const SPONSOR_POSITION = 12 // 0-based cell in the 9-col grid = start of the middle 3 columns of row 2
 
 export function cacheKey(boardId) {
   return `machiFeed:${boardId}`
@@ -43,49 +49,55 @@ export function frameHtml(post, boardId, origin) {
     </article>`
 }
 
-function renderPromoter(el, board) {
-  if (!board.promoterName) {
-    el.hidden = true
-    return
+export function qrTileHtml(submitUrl) {
+  return `<div class="tile"><div class="tile-qr">${qrSvg(submitUrl, 4, 2)}</div></div>`
+}
+
+export function sponsorHtml(board) {
+  const logo = board.promoterLogoKey
+    ? `<img class="promoter-logo" src="/promoter/${esc(board.promoterLogoKey)}" alt="${esc(board.promoterName ?? '')}" />`
+    : ''
+  return `
+    <div class="sponsor" style="grid-column: span 3">
+      ${logo}
+      ${board.promoterName ? `<span class="promoter-name">${esc(board.promoterName)}</span>` : ''}
+      ${board.promoterSlogan ? `<span class="promoter-slogan">${esc(board.promoterSlogan)}</span>` : ''}
+    </div>`
+}
+
+// One cell per DOM element: 24 tiles + 1 sponsor (spanning 3 grid cells) = 25 elements.
+// Live posts fill tile cells in feed order (newest first); the rest stay scannable QRs.
+export function buildBoardHtml(posts, boardId, origin, board) {
+  const submitUrl = submitQrUrl(origin, boardId)
+  const cells = []
+  let p = 0
+  for (let i = 0; i < GRID_COLS * GRID_ROWS; i++) {
+    if (i === SPONSOR_POSITION) {
+      cells.push(sponsorHtml(board))
+      i += 2 // the banner covers three columns
+      continue
+    }
+    cells.push(p < posts.length ? frameHtml(posts[p++], boardId, origin) : qrTileHtml(submitUrl))
   }
-  el.hidden = false
-  el.innerHTML = `
-    ${board.promoterLogoKey ? `<img class="promoter-logo" src="/api/photos/${esc(board.promoterLogoKey)}" alt="${esc(board.promoterName)}" />` : ''}
-    <span class="promoter-name">${esc(board.promoterName)}</span>
-    ${board.promoterSlogan ? `<span class="promoter-slogan">${esc(board.promoterSlogan)}</span>` : ''}`
+  return cells
 }
 
 export function initDisplayPage() {
   const boardId = boardIdFromPath(location.pathname)
-  const frames = document.getElementById('frames')
-  const framesRight = document.getElementById('frames-right')
-  const qrBox = document.getElementById('qr-box')
-  const promoterTile = document.getElementById('promoter-tile')
+  const grid = document.getElementById('grid')
   const offlineHint = document.getElementById('offline-hint')
-  if (!boardId || !frames || !framesRight || !qrBox) return
+  if (!boardId || !grid || !offlineHint) return
 
   const feedUrl = `/api/boards/${boardId}/feed`
   const key = cacheKey(boardId)
 
   function render(data) {
-    // Two frame columns flank the center sponsor column (sample-board layout, 2026-09-02).
-    const half = Math.ceil(data.posts.length / 2)
-    const left = data.posts.slice(0, half)
-    const right = data.posts.slice(half)
-    frames.innerHTML = left.map((p) => frameHtml(p, boardId, location.origin)).join('')
-    framesRight.innerHTML = right.map((p) => frameHtml(p, boardId, location.origin)).join('')
-    if (data.posts.length === 0) {
-      frames.innerHTML = '<p class="empty">Noch keine Inserate.</p>'
-    }
-    renderPromoter(promoterTile, data.board)
+    grid.innerHTML = buildBoardHtml(data.posts, boardId, location.origin, data.board).join('')
   }
 
   function setOffline(visible) {
     offlineHint.hidden = !visible
   }
-
-  // QR tile never changes: plain URL of this board's submit page.
-  qrBox.innerHTML = qrSvg(submitQrUrl(location.origin, boardId))
 
   // Last good feed from localStorage keeps the screen useful while offline.
   const cached = localStorage.getItem(key)

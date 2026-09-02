@@ -8,6 +8,7 @@ Build in **number order**. **State = folder**: a spec lives in `created/` until 
 |---|---|---|
 | 004 | [Photo storage & serving](created/004-photo-storage.md) — **blocked: R2 not enabled on the account** | 002 |
 | 011 | [Expiry cron](created/011-expiry-cron.md) — **blocked by 004** | 004 |
+| 013 | [Display layout per Tom's sample board](created/013-display-sample-layout.md) — waiting on Tom's tile-geometry description | 007 |
 
 ## Completed
 

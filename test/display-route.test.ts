@@ -28,8 +28,8 @@ describe('GET /b/{boardId}', () => {
     const body = await res.text()
     expect(body).toContain('<html lang="de">')
     expect(body).toContain('Machi-Board (Display)')
-    expect(body).toContain('Starte hier Dein kostenloses Inserat!')
-    expect(body).toContain('id="frames"')
+    expect(body).toContain('id="grid"')
+    expect(body).toContain('grid-template-columns: repeat(9, 1fr)')
   })
 
   it('still routes /b/{boardId}/neu to the submit page', async () => {

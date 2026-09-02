@@ -42,14 +42,14 @@ This page is the **overview contract**. Implementation proceeds as small numbere
 ## Display layout (Tom's sample board, 2026-09-02)
 
 * Header: **"Machi-Board (Display)"** — exact wording to verify with Tom
-* **Sponsor tile in the MIDDLE of the board** (Tom's correction: the sponsor/promoter tile sits centered, not bottom-right). Implemented as a center column (promoter tile + big QR tile) flanked by frame columns left and right.
-* Main area: live frames — title, text/photo, contact details, comment count, small QR per frame
-* Big QR tile: "Starte hier Dein kostenloses Inserat!" → `/b/{boardId}/neu`
-* **Tiles must match Tom's sample board EXACTLY** — open item: the sample screenshot (Desktop `Screenshot 2026-09-02 111217.png`) could not be rendered in the implementing session (no image support). Structure extracted programmatically (OCR + pixel analysis, see `scripts/analyze-*.mjs`): header strip, dense tile grid with a center sponsor tile ("REWE" at the image center), dense bottom strip. Tom must confirm the tile geometry (or describe it in text) — the current layout is interim.
-* Promoter data: REWE FAMILIE SCHULZE / "Mehr Nähe geht nicht." (slogan wording to verify)
+* **Board grid: 3 rows × 9 columns of tiles** (Tom, 2026-09-02): row 1 = 9 QR codes; row 2 = 3 QRs | sponsor banner (spans the middle 3 columns) | 3 QRs; row 3 = 9 QR codes. See spec 013.
+* **Sponsor banner in the middle**: Tom's image (`public/promoter/promoter.png`, source: gstatic URL in spec 013) + name REWE FAMILIE SCHULZE / slogan "Mehr Nähe geht nicht." (wording to verify)
+* **QR tiles**: every empty tile is a QR → `/b/{boardId}/neu` (scan → post there)
+* **Taken tiles**: live posts replace QR tiles in feed order (newest first); taken tiles show title/body/photo/contacts/comment count + their comment QR
 * Polls the feed every 20–30 s; works offline-ish (last feed cached, subtle offline hint)
 * 55" legibility: large type, high contrast, readable from a few meters
 * **MVP = a single market (one board)** — Tom's decision 2026-09-02; multi-board stays in the data model, out of MVP scope
+* Follow-up candidate: per-tile slots (scan tile N → post lands in tile N) — today every QR leads to the same submit form
 
 ## Pages
 

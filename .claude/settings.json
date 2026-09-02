@@ -1,0 +1,28 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/spec-gate.mjs",
+            "timeout": 10,
+            "statusMessage": "Spec gate: checking wiki/specs/created/"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/spec-gate.mjs",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
