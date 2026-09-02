@@ -12,7 +12,7 @@ function postCard(post) {
       <span class="badge">${esc(post.category)}</span>
       <h4>${esc(post.title)}</h4>
       <p>${esc(post.body)}</p>
-      ${post.photoKey ? `<img src="/api/photos/${esc(post.photoKey)}" alt="Foto" loading="lazy" />` : ''}
+      ${post.photoKey ? `<img data-photo="/api/photos/${esc(post.photoKey)}" alt="Foto" />` : ''}
       ${contactsLine(post)}
       <p class="meta">${esc(post.createdAt)} · ${esc(post.durationWeeks)} W.</p>
       <div class="actions">
@@ -40,7 +40,7 @@ function liveCard(post) {
       <span class="badge">${esc(post.category)}</span>
       <h4>${esc(post.title)}</h4>
       <p>${esc(post.body)}</p>
-      ${post.photoKey ? `<img src="/api/photos/${esc(post.photoKey)}" alt="Foto" loading="lazy" />` : ''}
+      ${post.photoKey ? `<img data-photo="/api/photos/${esc(post.photoKey)}" alt="Foto" />` : ''}
       ${contactsLine(post)}
       <p class="meta">${esc(post.createdAt)}</p>
       <div class="actions">
@@ -102,6 +102,27 @@ export function initAdminPage() {
     renderList(livePosts, live.posts.map(liveCard).join(''), 'Noch nichts live.')
     queueSection.hidden = false
     loginSection.hidden = true
+    await attachPhotoPreviews()
+  }
+
+  // Photo serving is auth-gated for pending posts; plain <img> tags cannot send the
+  // session header, so previews load via fetch(Bearer) into blob URLs.
+  async function attachPhotoPreviews() {
+    const imgs = document.querySelectorAll('img[data-photo]')
+    for (const img of imgs) {
+      const url = img.getAttribute('data-photo')
+      try {
+        const res = await fetch(url, { headers: { authorization: `Bearer ${token}` } })
+        if (!res.ok) {
+          img.remove()
+          continue
+        }
+        const blob = await res.blob()
+        img.src = URL.createObjectURL(blob)
+      } catch {
+        img.remove()
+      }
+    }
   }
 
   async function handleAction(action, id) {

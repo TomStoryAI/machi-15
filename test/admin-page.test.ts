@@ -34,6 +34,9 @@ function stubApi(overrides: { onAction?: (url: string, init: RequestInit) => voi
         if (password === 'geheim') return json(200, { token: 'tok', expiresAt: new Date(Date.now() + 864e5).toISOString() })
         return json(401, { error: 'Anmeldung fehlgeschlagen.' })
       }
+      if (url.includes('/api/photos/')) {
+        return new Response('foto-bytes', { status: 200, headers: { 'content-type': 'image/jpeg' } })
+      }
       if (!init.headers || !String(init.headers.authorization).startsWith('Bearer ')) {
         return json(401, { error: 'Sitzung abgelaufen. Bitte erneut anmelden.' })
       }
@@ -53,6 +56,8 @@ function setupPage() {
   document.documentElement.innerHTML = html
   history.replaceState(null, '', '/admin/b1')
   sessionStorage.clear()
+  URL.createObjectURL = ((blob: Blob) => `blob:fake-${blob.size}`) as typeof URL.createObjectURL
+  URL.revokeObjectURL = (() => {}) as typeof URL.revokeObjectURL
 }
 
 function fillAndSubmitLogin(password = 'geheim') {
@@ -110,7 +115,39 @@ describe('admin page', () => {
     expect(live.textContent).toContain('Suche: Katze')
     expect(live.textContent).toContain('Löschen')
     const liveImg = live.querySelector('img')!
-    expect(liveImg.getAttribute('src')).toBe('/api/photos/k2')
+    expect(liveImg.getAttribute('data-photo')).toBe('/api/photos/k2')
+    expect(liveImg.getAttribute('src')).toContain('blob:fake-')
+  })
+
+  it('loads photo previews with the admin session and shows them as blob URLs', async () => {
+    const pendingWithPhoto = {
+      ...pendingBody,
+      posts: [{ ...pendingBody.posts[0], photoKey: 'k1' }],
+    }
+    const calls: { url: string; init: RequestInit }[] = []
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string, init: RequestInit = {}) => {
+        calls.push({ url, init })
+        if (url.endsWith('/login')) return json(200, { token: 'tok', expiresAt: new Date(Date.now() + 864e5).toISOString() })
+        if (url.endsWith('/pending')) return json(200, pendingWithPhoto)
+        if (url.endsWith('/live')) return json(200, liveBody)
+        if (url.includes('/api/photos/k1')) {
+          return new Response('foto-bytes', { status: 200, headers: { 'content-type': 'image/jpeg' } })
+        }
+        return json(404, { error: 'unbekannt' })
+      }),
+    )
+    initAdminPage()
+    fillAndSubmitLogin('geheim')
+    await waitVisible('queue-section')
+
+    const photoCall = calls.find((c) => c.url.includes('/api/photos/k1'))!
+    expect(photoCall).toBeTruthy()
+    expect(String(photoCall.init.headers?.authorization)).toBe('Bearer tok')
+    const img = document.querySelector('#pending-posts img') as HTMLImageElement
+    expect(img).not.toBeNull()
+    expect(img.getAttribute('src')).toContain('blob:fake-')
   })
 
   it('shows the generic German error on a wrong password', async () => {

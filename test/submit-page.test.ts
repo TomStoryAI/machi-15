@@ -148,6 +148,12 @@ describe('submit page form', () => {
 
   it('uploads a selected photo to the created post with the management token', async () => {
     vi.stubGlobal('createImageBitmap', vi.fn().mockResolvedValue({ width: 800, height: 600, close: vi.fn() }))
+    HTMLCanvasElement.prototype.getContext = function () {
+      return { drawImage: () => {} } as unknown as CanvasRenderingContext2D
+    }
+    HTMLCanvasElement.prototype.toBlob = function (cb) {
+      cb(new Blob(['jpeg'], { type: 'image/jpeg' }))
+    }
     vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
       if (url === '/api/posts') return Promise.resolve(jsonResponse(201, { postId: 'p1', mgmtToken: 'tok' }))
       return Promise.resolve(jsonResponse(201, { photoKey: 'k1' }))
@@ -175,11 +181,18 @@ describe('submit page form', () => {
     const body = photoCall[1].body as FormData
     const uploaded = body.get('photo') as File
     expect(uploaded.name).toBe('foto.jpg')
-    expect(uploaded.size).toBe(file.size)
+    expect(uploaded.type).toBe('image/jpeg')
+    expect(uploaded.size).toBeGreaterThan(0)
   })
 
   it('still confirms the post but notes when the photo upload fails', async () => {
     vi.stubGlobal('createImageBitmap', vi.fn().mockResolvedValue({ width: 800, height: 600, close: vi.fn() }))
+    HTMLCanvasElement.prototype.getContext = function () {
+      return { drawImage: () => {} } as unknown as CanvasRenderingContext2D
+    }
+    HTMLCanvasElement.prototype.toBlob = function (cb) {
+      cb(new Blob(['jpeg'], { type: 'image/jpeg' }))
+    }
     vi.stubGlobal('fetch', vi.fn().mockImplementation((url: string) => {
       if (url === '/api/posts') return Promise.resolve(jsonResponse(201, { postId: 'p1', mgmtToken: 'tok' }))
       return Promise.resolve(jsonResponse(400, { error: 'Bitte wähle ein Bild aus.' }))
@@ -236,10 +249,22 @@ describe('photo resize', () => {
     expect(drawArgs[4]).toBe(1200)
   })
 
-  it('passes small photos through untouched', async () => {
+  it('re-encodes small photos as JPEG too (HEIC/iOS and TV compatibility)', async () => {
     vi.stubGlobal('createImageBitmap', vi.fn().mockResolvedValue({ width: 800, height: 600, close: vi.fn() }))
-    const file = new File(['x'], 'klein.jpg', { type: 'image/jpeg' })
-    expect(await resizePhotoFile(file)).toBe(file)
+    let drawArgs: unknown[] = []
+    HTMLCanvasElement.prototype.getContext = function () {
+      return { drawImage: (...args: unknown[]) => { drawArgs = args } } as unknown as CanvasRenderingContext2D
+    }
+    HTMLCanvasElement.prototype.toBlob = function (cb) {
+      cb(new Blob(['jpeg'], { type: 'image/jpeg' }))
+    }
+    const file = new File(['x'], 'foto.heic', { type: 'image/heic' })
+    const result = await resizePhotoFile(file)
+    expect(result).not.toBe(file)
+    expect(result).toBeInstanceOf(Blob)
+    expect(drawArgs).toHaveLength(5)
+    expect(drawArgs[3]).toBe(800)
+    expect(drawArgs[4]).toBe(600)
   })
 })
 

@@ -44,9 +44,7 @@ export function buildPayload(boardId, values) {
 export async function resizePhotoFile(file, maxSide = PHOTO_MAX_SIDE, quality = PHOTO_JPEG_QUALITY) {
   const bitmap = await createImageBitmap(file)
   try {
-    if (bitmap.width <= maxSide && bitmap.height <= maxSide) {
-      return file
-    }
+    // Always re-encode to JPEG: phones shoot HEIC which the TV browser cannot render.
     const { width, height } = fitImage(bitmap.width, bitmap.height, maxSide)
     const canvas = document.createElement('canvas')
     canvas.width = width
@@ -98,8 +96,7 @@ export function initSubmitPage() {
       photoPreview.src = URL.createObjectURL(photoBlob)
       photoPreview.hidden = false
       const kb = Math.round(photoBlob.size / 1024)
-      photoNote.textContent =
-        photoBlob === file ? `Foto bereit (${kb} KB).` : `Foto automatisch verkleinert (${kb} KB).`
+      photoNote.textContent = `Foto bereit (${kb} KB).`
       photoNote.hidden = false
     } catch {
       photoBlob = null
@@ -145,6 +142,7 @@ export function initSubmitPage() {
         })
         if (!upload || !upload.ok) {
           const warn = document.getElementById('photo-warn')
+          warn.textContent = 'Das Foto konnte nicht hochgeladen werden. Dein Inserat ist trotzdem eingereicht.'
           warn.hidden = false
         }
       }
